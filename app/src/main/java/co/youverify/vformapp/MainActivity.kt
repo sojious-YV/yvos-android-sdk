@@ -1,20 +1,37 @@
 package co.youverify.vformapp
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import co.youverify.workflow_builder_sdk.modules.vform.VFormOption
-import co.youverify.workflow_builder_sdk.YouverifySdk
-import co.youverify.workflow_builder_sdk.modules.documentcapture.DocumentOption
-import co.youverify.workflow_builder_sdk.modules.livenesscheck.LivenessOption
+import co.youverify.yvos_sdk.modules.vform.VFormOption
+import co.youverify.yvos_sdk.YouverifySdk
+import co.youverify.yvos_sdk.modules.documentcapture.DocumentData
+import co.youverify.yvos_sdk.modules.documentcapture.DocumentOption
+import co.youverify.yvos_sdk.modules.documentcapture.DocumentPersonalInfo
+import co.youverify.yvos_sdk.modules.livenesscheck.LivenessData
+import co.youverify.yvos_sdk.modules.livenesscheck.LivenessOption
+import co.youverify.yvos_sdk.modules.livenesscheck.LivenessPersonalInfo
+import co.youverify.yvos_sdk.modules.vform.GenderType
+import co.youverify.yvos_sdk.modules.vform.VFormEntryData
+import co.youverify.yvos_sdk.modules.vform.VFormPersonalInfo
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
+    private var livenessClicked: Boolean=false
+    private var formclicked: Boolean=false
+    private var documentClicked: Boolean=false
+    private lateinit var showDataButton: Button
+    private var mFormData: VFormEntryData?=null
+    private var mDocumentData: DocumentData?=null
+    private var mLivenessData: LivenessData?=null
     lateinit var progressBar:ProgressBar
     lateinit var formButton: Button
     lateinit var livenessButton: Button
@@ -29,40 +46,61 @@ class MainActivity : AppCompatActivity() {
         formButton=findViewById(R.id.form_button)
         livenessButton=findViewById(R.id.liveness_button)
         documentButton=findViewById(R.id.document_button)
+        showDataButton=findViewById(R.id.button_returned_data)
+
 
         formButton.setOnClickListener{
-            progressBar.visibility=View.VISIBLE
-            formButton.visibility=  View.INVISIBLE
-            livenessButton.visibility=  View.INVISIBLE
-            documentButton.visibility=  View.INVISIBLE
-
-
+            formclicked=true
+            livenessClicked=false
+            documentClicked=false
             useVFormModule()
-            //useLivenessModule()
-            //useDocumentCaptureModule()
         }
-
-
         livenessButton.setOnClickListener{
-            progressBar.visibility=View.VISIBLE
-            formButton.visibility=  View.INVISIBLE
-            livenessButton.visibility=  View.INVISIBLE
-            documentButton.visibility=  View.INVISIBLE
-
+            livenessClicked=true
+            formclicked=false
+            documentClicked=false
             useLivenessModule()
-            //useDocumentCaptureModule()
         }
-
         documentButton.setOnClickListener{
-            progressBar.visibility=View.VISIBLE
-            formButton.visibility=  View.INVISIBLE
-            livenessButton.visibility=  View.INVISIBLE
-            documentButton.visibility=  View.INVISIBLE
-
+            documentClicked=true
+            formclicked=false
+            livenessClicked=false
             useDocumentCaptureModule()
         }
+        showDataButton.setOnClickListener{showProcessData()}
 
 
+
+
+
+    }
+
+    private fun showProcessData() {
+        if (formclicked) {
+
+            val data=Gson().toJson(mFormData)
+            startActivity(
+            Intent(this,FormDataActivity::class.java).apply { putExtra(RETURNED_DATA_STRING,data) }
+            )
+            return
+        }
+
+
+        if (livenessClicked){
+            val data=Gson().toJson(mLivenessData)
+            startActivity(
+                Intent(this,LivenessDataActivity::class.java).apply { putExtra(RETURNED_DATA_STRING,data) }
+            )
+            return
+        }
+
+        if (documentClicked){
+            val data=Gson().toJson(mDocumentData)
+            startActivity(
+                Intent(this,DocumentDataActivity::class.java).apply { putExtra(RETURNED_DATA_STRING,data) }
+            )
+            return
+        }
 
     }
 
@@ -71,63 +109,49 @@ class MainActivity : AppCompatActivity() {
 
        // 6418559951282f74e34472e9 -1
         //644933b8c451436821dac571 -2
+        // New public merchant key - 62b2e8b281442b03187f7896
         val vFormOption= VFormOption(
             vFormId = "6418559951282f74e34472e9",
             publicMerchantKey = "61d880f1e8e15aaf24558f1a",
+            //publicMerchantKey = "62b2e8b281442b03187f7896",
             dev = true,
-            onClose = {
-                progressBar.visibility=View.INVISIBLE
-                formButton.visibility=  View.VISIBLE
-                livenessButton.visibility=  View.VISIBLE
-                documentButton.visibility=  View.VISIBLE
-            },
-            onSuccess = {
-                progressBar.visibility=View.INVISIBLE
-                formButton.visibility=  View.VISIBLE
-                livenessButton.visibility=  View.VISIBLE
-                documentButton.visibility=  View.VISIBLE
-            }
+
+            onSuccess = {vformData -> mFormData=vformData},
+            onCompleted={vformData ->
+               // mFormData=vformData
+                        },
+            onFailed={vformData -> mFormData=vformData},
+            /*personalInfo = VFormPersonalInfo(
+                firstName = "Adesoji",
+                lastName = "Olowa",
+                //middleName = "Yekeen",
+                //email = "abc@gmail.com",
+                //mobile = "07012345678",
+                //gender = GenderType.MALE
+            )*/
         )
 
 
         val vFormModule=YouverifySdk.vFormModule(option = vFormOption)
-        lifecycleScope.launch {
-           /* try {
-                vFormModule.start(this@MainActivity)
-            }catch (e:Exception){
-                progressBar.visibility=View.INVISIBLE
-                formButton.visibility=View.VISIBLE
-                Toast.makeText(this@MainActivity,e.message,Toast.LENGTH_LONG).show()
-            }*/
 
+        lifecycleScope.launch {
             vFormModule.start(this@MainActivity)
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (progressBar.visibility==View.VISIBLE) progressBar.visibility= View.INVISIBLE
-        if(formButton.visibility==View.INVISIBLE) formButton.visibility=View.VISIBLE
-        if(livenessButton.visibility==View.INVISIBLE) livenessButton.visibility=  View.VISIBLE
-        if (documentButton.visibility==View.INVISIBLE) documentButton.visibility=View.VISIBLE
-    }
+
 
     private fun useLivenessModule(){
         val livenessOption= LivenessOption(
-            publicMerchantKey = "61d880f1e8e15aaf24558f1a",
+            //publicMerchantKey = "61d880f1e8e15aaf24558f1a",
+            publicMerchantKey = "6222a5ed3e7a41c29c031ecc",
             dev = true,
-            onClose = {
-                progressBar.visibility=View.INVISIBLE
-                formButton.visibility=  View.VISIBLE
-                livenessButton.visibility=  View.VISIBLE
-                documentButton.visibility=  View.VISIBLE
-            },
-            onSuccess = {
-                progressBar.visibility=View.INVISIBLE
-                formButton.visibility=  View.VISIBLE
-                livenessButton.visibility=  View.VISIBLE
-                documentButton.visibility=  View.VISIBLE
-            }
+            onClose = { livenessData -> mLivenessData=livenessData },
+            onSuccess = {livenessData -> mLivenessData=livenessData },
+            onFailure = {livenessData -> mLivenessData=livenessData },
+            onCancel = {livenessData ->mLivenessData=livenessData },
+            onRetry = {livenessData -> mLivenessData=livenessData },
+            personalInfo = LivenessPersonalInfo(firstName = "Adesoji")
         )
 
         val livenessModule=YouverifySdk.livenessModule(livenessOption)
@@ -139,25 +163,12 @@ class MainActivity : AppCompatActivity() {
     private fun useDocumentCaptureModule(){
         val documentOption= DocumentOption(
             publicMerchantKey = "61d880f1e8e15aaf24558f1a",
+            //publicMerchantKey = "6222a5ed3e7a41c29c031ecc",
             dev = true,
-            onClose = {
-                progressBar.visibility=View.INVISIBLE
-                formButton.visibility=  View.VISIBLE
-                livenessButton.visibility=  View.VISIBLE
-                documentButton.visibility=  View.VISIBLE
-            },
-            onSuccess = {
-                progressBar.visibility=View.INVISIBLE
-                formButton.visibility=  View.VISIBLE
-                livenessButton.visibility=  View.VISIBLE
-                documentButton.visibility=  View.VISIBLE
-            },
-            onCancel ={
-                progressBar.visibility=View.INVISIBLE
-                formButton.visibility=  View.VISIBLE
-                livenessButton.visibility=  View.VISIBLE
-                documentButton.visibility=  View.VISIBLE
-            }
+            onClose = {documentData -> mDocumentData=documentData },
+            onSuccess = {documentData ->mDocumentData=documentData},
+            onCancel ={documentData ->mDocumentData=documentData},
+            personalInfo = DocumentPersonalInfo(firstName = "Adesoji")
         )
 
         val documentModule=YouverifySdk.documentCaptureModule(option = documentOption)

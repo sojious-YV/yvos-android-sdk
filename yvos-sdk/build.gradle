@@ -2,11 +2,12 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+   // id "kotlin.plugin.serialization"
 
 }
 
 android {
-    namespace 'co.youverify.workflow_builder_sdk'
+    namespace 'co.youverify.yvos_sdk'
     compileSdk 33
 
     defaultConfig {
@@ -24,22 +25,31 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        //sourceCompatibility JavaVersion.VERSION_1_8
+        //targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        //jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     buildFeatures {
         viewBinding true
+        compose true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.4.6'
+        //kotlinCompilerVersion '1.4.21'
+    }
+
 }
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.10.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
@@ -70,6 +80,22 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:2.44.2"
 
     // Androidx webkit
-    implementation"androidx.webkit:webkit:1.6.1"
+    implementation"androidx.webkit:webkit:1.7.0"
+
+    //Jetpack compose
+    implementation 'androidx.activity:activity-compose:1.7.2'
+    implementation "androidx.compose.ui:ui:$compose_version"
+    implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
+    implementation 'androidx.compose.material3:material3-android:1.2.0-alpha02'
+    implementation "androidx.compose.animation:animation:$compose_version"
+    implementation "androidx.compose.foundation:foundation:$compose_version"
+    implementation "androidx.compose.runtime:runtime:$compose_version"
+
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
+    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+
+    //implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0"
+
 
 }
