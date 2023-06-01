@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">VformApp</string>
+    <string name="title_activity_document_data">DocumentDataActivity</string>
+    <string name="title_activity_liveness_data">LivenessDataActivity</string>
+    <string name="title_activity_form_data">FormDataActivity</string>
+
 </resources>
