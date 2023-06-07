@@ -10,20 +10,21 @@
         android:required="true" />
 
     <application android:usesCleartextTraffic="true">
+
         <activity
             android:name=".modules.documentcapture.DocumentCaptureActivity"
             android:exported="false"
-            android:theme="@style/Theme.VformApp"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.VformApp" />
         <activity
             android:name=".modules.livenesscheck.LivenessCheckActivity"
             android:exported="false"
-            android:theme="@style/Theme.VformApp"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.VformApp" />
         <activity
             android:name=".modules.vform.FormActivity"
             android:exported="false"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop" />
     </application>
 
 </manifest>

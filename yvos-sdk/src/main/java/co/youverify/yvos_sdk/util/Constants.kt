@@ -10,5 +10,6 @@ internal const val IDENTITY_PRODUCTION_API_BASE_URL="https://identity.svc.youver
 internal const val IDENTITY_DEVELOPMENT_API_BASE_URL="https://identity.dev.svc.youverify.co/"
 internal const val USER_NAME="USERNAME"
 internal const val RETURNED_DATA_STRING="RETURNED_DATA"
+internal const val ACTIVITY_TO_START="ACTIVITY_TO_START"
 
 //https://os.dev.youverify.co/services/61d880f1e8e15aaf24558f1a/document?countries=""&primaryColor=#46B2C8"

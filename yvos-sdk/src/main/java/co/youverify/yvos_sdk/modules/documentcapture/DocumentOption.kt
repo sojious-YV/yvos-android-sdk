@@ -1,5 +1,6 @@
 package co.youverify.yvos_sdk.modules.documentcapture
 
+import co.youverify.yvos_sdk.Appearance
 import co.youverify.yvos_sdk.Option
 
  class DocumentOption(
@@ -8,6 +9,13 @@ import co.youverify.yvos_sdk.Option
     dev: Boolean=false,
     metadata: Map<String, Any> = emptyMap(),
     val personalInfo:DocumentPersonalInfo?=null,
+    val appearance: Appearance=Appearance(
+       greeting = "We will need to carry out a  document capture. It will only take a moment.",
+       actionText = "Start Document Capture",
+       buttonBackgroundColor = "#46B2C8",
+       buttonTextColor = "#ffffff",
+       primaryColor = "#46B2C8"
+    ),
     val countries: List<Country>?=null,
     val onSuccess: (DocumentData?) -> Unit,
     val onCancel: (DocumentData?) -> Unit,

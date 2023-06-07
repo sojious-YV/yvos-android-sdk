@@ -42,9 +42,13 @@ class PersonalizedDialogView @JvmOverloads constructor(
     override fun Content() {
         ModalWindow(
             name =_nameText.value ,
-            onStartButtonClicked = { /*TODO*/ },
+            onActionButtonClicked = {  },
             //loadingUrl =_loadingUrl.value ,
-            visible =_isVisible.value
+            visible =_isVisible.value,
+            buttonBackGroundColorString = "#46B2C8",
+            buttonTextColorString = "#ffffff",
+            buttonText = "Verify Identity",
+            greeting = "We will need to verify your identity. It will only take a moment."
         )
     }
 }

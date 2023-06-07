@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ProgressBar
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import co.youverify.yvos_sdk.Appearance
 import co.youverify.yvos_sdk.modules.vform.VFormOption
 import co.youverify.yvos_sdk.YouverifySdk
 import co.youverify.yvos_sdk.modules.documentcapture.DocumentData
@@ -121,14 +122,21 @@ class MainActivity : AppCompatActivity() {
                // mFormData=vformData
                         },
             onFailed={vformData -> mFormData=vformData},
-            /*personalInfo = VFormPersonalInfo(
+            personalInfo = VFormPersonalInfo(
                 firstName = "Adesoji",
                 lastName = "Olowa",
                 //middleName = "Yekeen",
                 //email = "abc@gmail.com",
                 //mobile = "07012345678",
                 //gender = GenderType.MALE
-            )*/
+            ),
+        appearance = Appearance(
+            greeting = "We really really really need to verify your identity. It will only take a moment.",
+            actionText = "Start Jare",
+            buttonBackgroundColor = "#46B2C8",
+            buttonTextColor = "#ffffff",
+            primaryColor = "#bf00ff"
+        )
         )
 
 
@@ -143,15 +151,22 @@ class MainActivity : AppCompatActivity() {
 
     private fun useLivenessModule(){
         val livenessOption= LivenessOption(
-            //publicMerchantKey = "61d880f1e8e15aaf24558f1a",
-            publicMerchantKey = "6222a5ed3e7a41c29c031ecc",
+            publicMerchantKey = "61d880f1e8e15aaf24558f1a",
+            //publicMerchantKey = "6222a5ed3e7a41c29c031ecc",
             dev = true,
             onClose = { livenessData -> mLivenessData=livenessData },
             onSuccess = {livenessData -> mLivenessData=livenessData },
             onFailure = {livenessData -> mLivenessData=livenessData },
             onCancel = {livenessData ->mLivenessData=livenessData },
             onRetry = {livenessData -> mLivenessData=livenessData },
-            personalInfo = LivenessPersonalInfo(firstName = "Adesoji")
+            personalInfo = LivenessPersonalInfo(firstName = "Adesoji"),
+            /*appearance = Appearance(
+                greeting = "We will need to verify your identity. It will only take a moment.",
+                actionText = "Verify Identity",
+                buttonBackgroundColor = "#46B2C8",
+                buttonTextColor = "#ffffff",
+                primaryColor = "#46B2C8"
+            )*/
         )
 
         val livenessModule=YouverifySdk.livenessModule(livenessOption)
@@ -164,11 +179,19 @@ class MainActivity : AppCompatActivity() {
         val documentOption= DocumentOption(
             publicMerchantKey = "61d880f1e8e15aaf24558f1a",
             //publicMerchantKey = "6222a5ed3e7a41c29c031ecc",
-            dev = true,
+            //dev = true,
+            dev=true,
             onClose = {documentData -> mDocumentData=documentData },
             onSuccess = {documentData ->mDocumentData=documentData},
             onCancel ={documentData ->mDocumentData=documentData},
-            personalInfo = DocumentPersonalInfo(firstName = "Adesoji")
+            personalInfo = DocumentPersonalInfo(firstName = "Adesoji"),
+            appearance = Appearance(
+                greeting = "We will need to verify your identity. It will only take a moment.",
+                actionText = "Verify Identity",
+                buttonBackgroundColor = "#46B2C8",
+                buttonTextColor = "#ffffff",
+                primaryColor = "#ffff00"
+            )
         )
 
         val documentModule=YouverifySdk.documentCaptureModule(option = documentOption)

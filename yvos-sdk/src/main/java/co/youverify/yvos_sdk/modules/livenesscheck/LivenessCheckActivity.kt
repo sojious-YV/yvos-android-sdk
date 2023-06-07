@@ -4,7 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.hardware.camera2.CameraManager
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -12,20 +12,20 @@ import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.ProgressBar
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
-import androidx.lifecycle.lifecycleScope
 import co.youverify.yvos_sdk.R
 import co.youverify.yvos_sdk.components.ModalWindow
+import co.youverify.yvos_sdk.components.ProgressIndicator
 import co.youverify.yvos_sdk.data.LivenessRequest
 import co.youverify.yvos_sdk.data.LivenessResponse
 import co.youverify.yvos_sdk.data.SdkServiceFactory
-import co.youverify.yvos_sdk.modules.vform.JsObject
+import co.youverify.yvos_sdk.JsObject
+import co.youverify.yvos_sdk.modules.vform.VFormModule
 import co.youverify.yvos_sdk.theme.SdkTheme
 import co.youverify.yvos_sdk.util.NetworkResult
 import co.youverify.yvos_sdk.util.SdkException
@@ -33,21 +33,20 @@ import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
 import co.youverify.yvos_sdk.util.handleApi
 import com.google.gson.Gson
-import kotlinx.coroutines.launch
 import java.io.IOException
 
 class LivenessCheckActivity : AppCompatActivity() {
 
-    private lateinit var cameraManager: CameraManager
-    private var cameraPermissionGranted = false
-    private lateinit var composeView: ComposeView
+    private val progressIndicatorVisible= mutableStateOf(true)
+    var cameraPermissionGranted = false
+    private set
+    private lateinit var modalWindowView: ComposeView
+    private lateinit var progressIndicatorView: ComposeView
     private var userName: String?=null
     private var pageReady = false
     private  var url: String?=null
     private lateinit var webView: WebView
     private val TAG="FormActivity"
-    //private lateinit var closeButton: ImageView
-    private lateinit var progressBar: ProgressBar
     private val modalWindowVisible = mutableStateOf(false)
     private val cameraPermissionRequestLauncher: ActivityResultLauncher<String> = createCameraPermissionRequestLauncher()
     lateinit var onClose:(LivenessData?)->Unit
@@ -62,11 +61,10 @@ class LivenessCheckActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_liveness_check)
 
-
+        lifecycle.addObserver(LivenessCheckModule.livenessActivityObserver)
 
         initializeViews()
         setUpWebView()
-        checkForCameraPermission()
 
         //Disable back button
         /*onBackPressedDispatcher.addCallback(this,object : OnBackPressedCallback(true){
@@ -76,36 +74,45 @@ class LivenessCheckActivity : AppCompatActivity() {
             }
         })*/
 
-        lifecycle.addObserver(LivenessCheckModule.livenessActivityObserver)
-
-
     }
 
-
+    override fun onStart() {
+        super.onStart()
+        checkForCameraPermission()
+    }
 
     private fun initializeViews() {
 
         webView=findViewById(R.id.webView_liveness)
-        composeView=findViewById(R.id.composeView)
+        modalWindowView=findViewById(R.id.modalWindowView)
         //closeButton=findViewById(R.id.liveness_close_button)
-        progressBar=findViewById(R.id.progressBar)
+        progressIndicatorView=findViewById(R.id.progressIndicatorView)
         /*closeButton.setOnClickListener{
             finish()
         }*/
+        val appearance=LivenessCheckModule.livenessActivityObserver.option.appearance
 
 
         userName= intent.getStringExtra(USER_NAME)
 
-        composeView.setContent {
+        progressIndicatorView.setContent {
+            ProgressIndicator(colorString =appearance.primaryColor , visible =progressIndicatorVisible.value )
+        }
+
+        modalWindowView.setContent {
 
             SdkTheme {
                 ModalWindow(
                     name =userName?:"" ,
-                    onStartButtonClicked = {
+                    onActionButtonClicked = {
                         modalWindowVisible.value=false
                         webView.visibility=View.VISIBLE
                     },
-                    visible = modalWindowVisible.value
+                    visible = modalWindowVisible.value,
+                    buttonBackGroundColorString = appearance.buttonBackgroundColor,
+                    buttonTextColorString = appearance.buttonTextColor,
+                    buttonText = appearance.actionText,
+                    greeting = appearance.greeting
                 )
             }
 
@@ -117,14 +124,21 @@ class LivenessCheckActivity : AppCompatActivity() {
         if(checkSelfPermission(Manifest.permission.CAMERA)==PackageManager.PERMISSION_GRANTED){
             cameraPermissionGranted=true
 
-            //load url if url is not presently null i.e if it has been sent by LivenessCheckModule class
-            url?.let{
-                webView.loadUrl(it)
+            //load url if url it's not presently null otherwise call LivenessCheckModule class to send it
+            if (url!=null){
+                webView.loadUrl(url!!)
+            }else{
+                LivenessCheckModule.livenessActivityObserver.sendLivenessUrl()
             }
+
+        }else{
+            //hide the progress indicator composable
+            progressIndicatorVisible.value=false
+            cameraPermissionRequestLauncher.launch(Manifest.permission.CAMERA)
+
         }
 
-        else
-            cameraPermissionRequestLauncher.launch(Manifest.permission.CAMERA)
+
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -136,12 +150,13 @@ class LivenessCheckActivity : AppCompatActivity() {
             settings.domStorageEnabled=true
             settings.allowContentAccess=true
             settings.allowFileAccess=true
-            //settings.loadWithOverviewMode=true
-            //settings.useWideViewPort=true
-            settings.builtInZoomControls=true
+            settings.loadWithOverviewMode=true
+            settings.useWideViewPort=true
+            //settings.builtInZoomControls=true
             settings.displayZoomControls=false
+            settings.mediaPlaybackRequiresUserGesture=false
             addJavascriptInterface(JsObject(this@LivenessCheckActivity),"Android")
-            setInitialScale(180)
+            setInitialScale(1)
 
             //Set up the Webview client
             webViewClient= object : WebViewClient() {
@@ -157,7 +172,7 @@ class LivenessCheckActivity : AppCompatActivity() {
                                     "})()"
                         )
 
-                        progressBar.visibility=View.INVISIBLE
+                        progressIndicatorVisible.value=false
 
                         if (userName.isNullOrEmpty())
                             webView.visibility=View.VISIBLE
@@ -176,6 +191,11 @@ class LivenessCheckActivity : AppCompatActivity() {
                 override fun onPermissionRequest(request: PermissionRequest?) {
                     Log.d(TAG, "OnPermissionRequest")
                     request?.grant(request.resources);
+                }
+
+                override fun getDefaultVideoPoster(): Bitmap? {
+                    //replace the default play button with a transparent background
+                    return Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
                 }
             }
 
@@ -267,7 +287,7 @@ class LivenessCheckActivity : AppCompatActivity() {
             response=handleApi { SdkServiceFactory.sdkService(option).postLivenessData( livenessRequest = request) }
             handleResponse(response)
         }catch (e:IOException){
-            progressBar.visibility=View.INVISIBLE
+
             Snackbar.make(
                 webView.rootView,
                 "Could not connect to server, check your internet connection",
@@ -281,7 +301,7 @@ class LivenessCheckActivity : AppCompatActivity() {
     private fun handleResponse(response: NetworkResult<LivenessResponse>) {
 
         if(response is NetworkResult.Success)   {
-            progressBar.visibility=View.INVISIBLE
+
             onSuccess(LivenessData(passed = response.data.data.passed,photo = response.data.data.faceImage))
             //finish()
         }
@@ -301,12 +321,21 @@ class LivenessCheckActivity : AppCompatActivity() {
 
             if (granted){
                 cameraPermissionGranted=true
-                url?.let{
-                    webView.loadUrl(it)
+
+                //show the progress indicator composable
+                progressIndicatorVisible.value=true
+
+                if (url!=null){
+                    webView.loadUrl(url!!)
+                }else{
+                    LivenessCheckModule.livenessActivityObserver.sendLivenessUrl()
                 }
             }
 
-            else
+            else{
+
+                //Hide the progress indicator composable
+                progressIndicatorVisible.value=false
                 Snackbar.make(
                     webView.rootView,
                     "You need to grant Camera Permission to proceed with the process",
@@ -314,6 +343,8 @@ class LivenessCheckActivity : AppCompatActivity() {
                 )
                     .setAction("Grant permission") { cameraPermissionRequestLauncher.launch(Manifest.permission.CAMERA) }
                     .show()
+            }
+
         }
 }
 

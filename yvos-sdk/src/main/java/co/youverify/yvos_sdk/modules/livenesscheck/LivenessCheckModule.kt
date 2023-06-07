@@ -8,6 +8,7 @@ import co.youverify.yvos_sdk.util.PRODUCTION_BASE_URL
 import co.youverify.yvos_sdk.util.SdkException
 import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
+import co.youverify.yvos_sdk.util.validatePublicMerchantKeyAndAppearance
 
 class LivenessCheckModule  constructor(private val option: LivenessOption) {
 
@@ -30,7 +31,7 @@ class LivenessCheckModule  constructor(private val option: LivenessOption) {
         //initialize Activity observer
         livenessActivityObserver = LivenessActivityObserver(this)
         livenessActivityObserver.option=option
-
+        mContext=context
 
         context.startActivity(
             Intent(context, LivenessCheckActivity::class.java).apply {
@@ -38,11 +39,8 @@ class LivenessCheckModule  constructor(private val option: LivenessOption) {
             }
         )
 
-        mContext=context
-
         //validate formId and MerchantKey length
         validateOption()
-        //sendLivenessUrl()
     }
 
 
@@ -60,9 +58,11 @@ class LivenessCheckModule  constructor(private val option: LivenessOption) {
     }
 
     private fun validateOption() {
-        if (option.publicMerchantKey.length!= ID_LENGTH || option.publicMerchantKey.isEmpty())
-            throw SdkException("public merchant key cannot be empty and must be 24 characters long")
 
+        validatePublicMerchantKeyAndAppearance(
+            publicMerchantKey = option.publicMerchantKey,
+            appearance = option.appearance
+        )
     }
 
 }

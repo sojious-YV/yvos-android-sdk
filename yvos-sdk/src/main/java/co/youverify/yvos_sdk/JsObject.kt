@@ -1,9 +1,10 @@
-package co.youverify.yvos_sdk.modules.vform
+package co.youverify.yvos_sdk
 
 import android.app.Activity
 import android.webkit.JavascriptInterface
 import co.youverify.yvos_sdk.modules.documentcapture.DocumentCaptureActivity
 import co.youverify.yvos_sdk.modules.livenesscheck.LivenessCheckActivity
+import co.youverify.yvos_sdk.modules.vform.FormActivity
 
 internal class JsObject(private val presenter: Activity) {
     @JavascriptInterface

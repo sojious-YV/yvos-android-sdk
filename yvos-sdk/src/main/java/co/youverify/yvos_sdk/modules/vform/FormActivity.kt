@@ -17,36 +17,39 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.ImageView
-import android.widget.ProgressBar
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
+import co.youverify.yvos_sdk.JsObject
 import co.youverify.yvos_sdk.R
 import co.youverify.yvos_sdk.components.ModalWindow
+import co.youverify.yvos_sdk.components.ProgressIndicator
 import co.youverify.yvos_sdk.theme.SdkTheme
 import co.youverify.yvos_sdk.util.SdkException
 import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
 
 class FormActivity : AppCompatActivity() {
 
+    private var cameraPermissionChecked: Boolean=false
+    var urlIsLoading: Boolean = false
+    private set
     private var pageIsAlreadyLoading: Boolean=false
     private var url: String?=null
     private var userName: String?=null
-    private var cameraPermissionGranted: Boolean=false
-    lateinit var composeView: ComposeView
-     private val modalWindowVisible=mutableStateOf(false)
+    var cameraPermissionGranted: Boolean=false
+    private set
+    lateinit var modalWindowView: ComposeView
+    private val modalWindowVisible=mutableStateOf(false)
+    private val progressIndicatorVisible=mutableStateOf(true)
     private var pageReady: Boolean=false
     private lateinit var webView: WebView
     private val TAG="FormActivity"
     //private lateinit var closeButton: ImageView
-    private lateinit var progressBar: ProgressBar
+    private lateinit var progressIndicatorView: ComposeView
     private var fileChooserValueCallback: ValueCallback<Array<Uri>>? = null
     private var fileChooserLauncher: ActivityResultLauncher<Intent> = createFileChooserLauncher()
     private val cameraPermissionRequestLauncher:ActivityResultLauncher<String> = createCameraPermissionRequestLauncher()
@@ -58,10 +61,13 @@ class FormActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        lifecycle.addObserver(VFormModule.formActivityObserver)
+
         setContentView(R.layout.activity_form)
         initializeViews()
         setUpWebView()
-        checkForCameraPermission()
+
 
 
         /*onBackPressedDispatcher.addCallback(this,object :OnBackPressedCallback(true){
@@ -72,31 +78,45 @@ class FormActivity : AppCompatActivity() {
             }
         })*/
 
-        lifecycle.addObserver(VFormModule.formActivityObserver)
 
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (!cameraPermissionChecked){ checkForCameraPermission() }
     }
 
     private fun initializeViews() {
 
         //closeButton=findViewById(R.id.form_close_button)
-        progressBar=findViewById(R.id.progressBar2)
-        composeView=findViewById(R.id.composeView)
+        val appearance= VFormModule.formActivityObserver.option.appearance
+        progressIndicatorView=findViewById(R.id.progressIndicatorView)
+        modalWindowView=findViewById(R.id.modalWindowView)
         webView=findViewById(R.id.webView_Vform)
-
 
         userName= intent.getStringExtra(USER_NAME)
 
-        composeView.setContent {
+        progressIndicatorView.setContent {
+            ProgressIndicator(colorString =appearance.primaryColor , visible =progressIndicatorVisible.value )
+        }
+
+        modalWindowView.setContent {
+
 
             SdkTheme {
                 ModalWindow(
                     name =userName?:"" ,
-                    onStartButtonClicked = {
+                    onActionButtonClicked = {
 
                         modalWindowVisible.value=false
                         webView.visibility=View.VISIBLE
                     },
-                    visible = modalWindowVisible.value
+                    visible = modalWindowVisible.value,
+                    buttonBackGroundColorString = appearance.buttonBackgroundColor,
+                    buttonTextColorString = appearance.buttonTextColor,
+                    buttonText = appearance.actionText,
+                    greeting = appearance.greeting
                 )
             }
 
@@ -108,17 +128,27 @@ class FormActivity : AppCompatActivity() {
     }
 
     private fun checkForCameraPermission() {
+
+        cameraPermissionChecked=true
         if(checkSelfPermission(Manifest.permission.CAMERA)==PackageManager.PERMISSION_GRANTED){
             cameraPermissionGranted=true
 
-            //load url if url is not presently null i.e if it has been sent by VformModule class
-            url?.let{
-                webView.loadUrl(it)
+            //load url if url is not presently null otherwise call VFormModule class to send it
+            if (url!=null){
+                webView.loadUrl(url!!)
+            }else{
+                urlIsLoading=true
+                VFormModule.formActivityObserver.sendFormUrl()
             }
+
         }
 
-        else
+        else{
+            //hide the progress indicator composable
+            progressIndicatorVisible.value=false
             cameraPermissionRequestLauncher.launch(Manifest.permission.CAMERA)
+
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -155,7 +185,7 @@ class FormActivity : AppCompatActivity() {
                                     "})()"
                         )
 
-                        progressBar.visibility=View.INVISIBLE
+                        progressIndicatorVisible.value=false
 
                         if (userName.isNullOrEmpty())
                             webView.visibility=View.VISIBLE
@@ -182,6 +212,11 @@ class FormActivity : AppCompatActivity() {
                     request?.grant(request.resources);
                 }
 
+                override fun getDefaultVideoPoster(): Bitmap? {
+                    //replace the default play button with a transparent background
+                    return Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
+                }
+
                 override fun onShowFileChooser(webView: WebView?, filePathCallback: ValueCallback<Array<Uri>>?, fileChooserParams: FileChooserParams?): Boolean {
                     try {
                         fileChooserValueCallback = filePathCallback;
@@ -206,11 +241,21 @@ class FormActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             if (it){
                 cameraPermissionGranted=true
-                url?.let {
+
+                //show the progress indicator composable
+                progressIndicatorVisible.value=true
+
+                if (url!=null){
                     webView.loadUrl(url!!)
+                }else{
+                    VFormModule.formActivityObserver.sendFormUrl()
                 }
             }
-            else
+            else{
+
+                //hide the progress indicator composable
+                progressIndicatorVisible.value=false
+
                 Snackbar.make(
                     webView.rootView,
                     "You need to grant Camera Permission to proceed with the process",
@@ -218,6 +263,8 @@ class FormActivity : AppCompatActivity() {
                 )
                     .setAction("Grant permission") { cameraPermissionRequestLauncher.launch(Manifest.permission.CAMERA) }
                     .show()
+            }
+
         }
 
 

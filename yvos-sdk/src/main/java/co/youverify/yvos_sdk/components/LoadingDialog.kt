@@ -1,6 +1,5 @@
 package co.youverify.yvos_sdk.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,19 +14,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import co.youverify.yvos_sdk.R
 import co.youverify.yvos_sdk.theme.yvColor
 
 @Composable
 fun LoadingDialog(modifier: Modifier = Modifier, message:String="Please wait..."){
 
-    Dialog(onDismissRequest = {}) {
+    Dialog(
+        onDismissRequest = {},
+    ) {
         Row(
             modifier=modifier.padding(horizontal = 32.dp).fillMaxWidth().background(color = Color(0xFF595959), shape = RoundedCornerShape(4.dp)),
             verticalAlignment = Alignment.CenterVertically,
@@ -36,13 +34,13 @@ fun LoadingDialog(modifier: Modifier = Modifier, message:String="Please wait..."
 
             Box(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, start = 8.dp).size(48.dp)){
 
-                Image(
+                /*Image(
                     painter = painterResource(id = R.drawable.baseline_close_24),
                     contentDescription =null ,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(37.dp,21.dp).align(Alignment.Center)
 
-                )
+                )*/
 
                 CircularProgressIndicator(
                     modifier = Modifier.size(48.dp),

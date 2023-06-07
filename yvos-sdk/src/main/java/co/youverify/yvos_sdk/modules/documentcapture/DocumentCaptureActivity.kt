@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -11,9 +12,6 @@ import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.ImageView
-import android.widget.ProgressBar
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.snackbar.Snackbar
@@ -23,10 +21,12 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.lifecycleScope
 import co.youverify.yvos_sdk.R
 import co.youverify.yvos_sdk.components.ModalWindow
+import co.youverify.yvos_sdk.components.ProgressIndicator
 import co.youverify.yvos_sdk.data.DocumentRequest
 import co.youverify.yvos_sdk.data.DocumentResponse
 import co.youverify.yvos_sdk.data.SdkServiceFactory
-import co.youverify.yvos_sdk.modules.vform.JsObject
+import co.youverify.yvos_sdk.JsObject
+import co.youverify.yvos_sdk.modules.livenesscheck.LivenessCheckModule
 import co.youverify.yvos_sdk.theme.SdkTheme
 import co.youverify.yvos_sdk.util.NetworkResult
 import co.youverify.yvos_sdk.util.SdkException
@@ -39,16 +39,18 @@ import java.io.IOException
 
 class DocumentCaptureActivity : AppCompatActivity() {
 
+    private val progressIndicatorVisible= mutableStateOf(true)
     private val url: String?=null
-    private var cameraPermissionGranted=false
+    var cameraPermissionGranted=false
+    private set
     private val modalWindowVisible = mutableStateOf(false)
-    private lateinit var composeView: ComposeView
+    private lateinit var modalWindowView: ComposeView
+    private lateinit var progressIndicatorView: ComposeView
     private var userName: String?=null
     private var pageReady: Boolean=false
     private lateinit var webView: WebView
     private val TAG="FormActivity"
     //private lateinit var closeButton: ImageView
-    private lateinit var progressBar: ProgressBar
     private val cameraPermissionRequestLauncher: ActivityResultLauncher<String> = createCameraPermissionRequestLauncher()
     lateinit var onClose:(DocumentData?)->Unit
     lateinit var onSuccess:(DocumentData?)->Unit
@@ -61,9 +63,11 @@ class DocumentCaptureActivity : AppCompatActivity() {
         setContentView(R.layout.activity_document_capture)
 
 
+        lifecycle.addObserver(DocumentCaptureModule.documentActivityObserver)
+
         initializeViews()
         setUpWebView()
-        checkForCameraPermission()
+
 
         //Disable back button
        /* onBackPressedDispatcher.addCallback(this,object : OnBackPressedCallback(true){
@@ -72,23 +76,19 @@ class DocumentCaptureActivity : AppCompatActivity() {
                 return
             }
         })*/
-
-        lifecycle.addObserver(DocumentCaptureModule.documentActivityObserver)
-
-
-
-
     }
 
 
-
-
+    override fun onStart(){
+        super.onStart()
+        checkForCameraPermission()
+    }
     private fun initializeViews() {
 
         webView=findViewById(R.id.webView_document_capture)
-        composeView=findViewById(R.id.composeView)
+        modalWindowView=findViewById(R.id.modalWindowView)
         //closeButton=findViewById(R.id.document_close_button)
-        progressBar=findViewById(R.id.progressBar)
+        progressIndicatorView=findViewById(R.id.progressIndicatorView)
 
         /*closeButton.setOnClickListener{
             finish()
@@ -96,16 +96,26 @@ class DocumentCaptureActivity : AppCompatActivity() {
 
         userName= intent.getStringExtra(USER_NAME)
 
-        composeView.setContent {
+        val appearance= DocumentCaptureModule.documentActivityObserver.option.appearance
 
+
+        progressIndicatorView.setContent {
+            ProgressIndicator(colorString =appearance.primaryColor , visible =progressIndicatorVisible.value )
+        }
+
+        modalWindowView.setContent {
             SdkTheme {
                 ModalWindow(
                     name =userName?:"" ,
-                    onStartButtonClicked = {
+                    onActionButtonClicked = {
                         modalWindowVisible.value=false
                         webView.visibility=View.VISIBLE
                     },
-                    visible = modalWindowVisible.value
+                    visible = modalWindowVisible.value,
+                    buttonBackGroundColorString = appearance.buttonBackgroundColor,
+                    buttonTextColorString = appearance.buttonTextColor,
+                    buttonText = appearance.actionText,
+                    greeting = appearance.greeting
                 )
             }
 
@@ -116,15 +126,28 @@ class DocumentCaptureActivity : AppCompatActivity() {
         if(checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED){
 
             cameraPermissionGranted=true
-            //load url if url is not presently null i.e if it has been sent by DocumentCaptureModule class
-            url?.let{
-                webView.loadUrl(it)
+
+
+            if (url!=null){
+                webView.loadUrl(url)
+            }else{
+                DocumentCaptureModule.documentActivityObserver.sendDocumentCaptureUrl()
             }
         }
 
 
-        else
-            cameraPermissionRequestLauncher.launch(Manifest.permission.CAMERA)
+        else{
+
+            //Hide the progress indicator composable
+            progressIndicatorVisible.value=false
+            Snackbar.make(
+                webView.rootView,
+                "You need to grant Camera Permission to proceed with the process",
+                Snackbar.LENGTH_INDEFINITE
+            )
+                .setAction("Grant permission") { cameraPermissionRequestLauncher.launch(Manifest.permission.CAMERA) }
+                .show()
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -135,13 +158,13 @@ class DocumentCaptureActivity : AppCompatActivity() {
             settings.domStorageEnabled=true
             settings.allowContentAccess=true
             settings.allowFileAccess=true
-            //settings.loadWithOverviewMode=true
-            //settings.useWideViewPort=true
+            settings.loadWithOverviewMode=true
+            settings.useWideViewPort=true
             settings.builtInZoomControls=true
             settings.displayZoomControls=false
             addJavascriptInterface(JsObject(this@DocumentCaptureActivity),"Android")
             //setInitialScale(300)
-            setInitialScale(180)
+            setInitialScale(1)
 
             //Set up the Webview client
             webViewClient= object : WebViewClient() {
@@ -157,7 +180,7 @@ class DocumentCaptureActivity : AppCompatActivity() {
                                     "})()"
                         )
 
-                        progressBar.visibility=View.INVISIBLE
+                        progressIndicatorVisible.value=false
 
                         if (userName.isNullOrEmpty())
                             webView.visibility=View.VISIBLE
@@ -174,6 +197,12 @@ class DocumentCaptureActivity : AppCompatActivity() {
                 override fun onPermissionRequest(request: PermissionRequest?) {
                     Log.d(TAG, "OnPermissionRequest")
                     request?.grant(request.resources);
+                }
+
+                override fun getDefaultVideoPoster(): Bitmap? {
+
+                    //replace the default play button with a transparent background
+                    return Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
                 }
             }
 
@@ -223,7 +252,7 @@ class DocumentCaptureActivity : AppCompatActivity() {
 
     private fun postScannedData(data: DocumentData?) {
 
-        progressBar.visibility= View.INVISIBLE
+        //progressBar.visibility= View.INVISIBLE
         val option=DocumentCaptureModule.documentActivityObserver.option
         val request = DocumentRequest(
             publicMerchantID = option.publicMerchantKey,
@@ -238,7 +267,7 @@ class DocumentCaptureActivity : AppCompatActivity() {
                 response= handleApi { SdkServiceFactory.sdkService(option).postDocumentData(request) }
                 handleResponse(response,data)
             }catch (e: IOException){
-                progressBar.visibility= View.INVISIBLE
+                //progressBar.visibility= View.INVISIBLE
                 Snackbar.make(
                     webView.rootView,
                     "Could not connect to server, check your internet connection",
@@ -253,7 +282,7 @@ class DocumentCaptureActivity : AppCompatActivity() {
     private fun handleResponse(response: NetworkResult<DocumentResponse>, data: DocumentData?) {
 
         if(response is NetworkResult.Success)   {
-            progressBar.visibility= View.INVISIBLE
+            //progressBar.visibility= View.INVISIBLE
             //onSuccess(data)
             //finish()
         }
@@ -274,12 +303,22 @@ class DocumentCaptureActivity : AppCompatActivity() {
             if (granted){
 
                 cameraPermissionGranted=true
-                url?.let {
-                    webView.loadUrl(it)
+
+
+                //show the progress indicator composable
+                progressIndicatorVisible.value=true
+
+                if (url!=null){
+                    webView.loadUrl(url)
+                }else{
+                    DocumentCaptureModule.documentActivityObserver.sendDocumentCaptureUrl()
                 }
             }
 
-            else
+            else{
+
+                //hide the progress indicator composable
+                progressIndicatorVisible.value=false
                 Snackbar.make(
                     webView.rootView,
                     "You need to grant Camera Permission to proceed with the process",
@@ -287,6 +326,8 @@ class DocumentCaptureActivity : AppCompatActivity() {
                 )
                     .setAction("Grant permission") { cameraPermissionRequestLauncher.launch(Manifest.permission.CAMERA) }
                     .show()
+            }
+
         }
 
 

@@ -2,9 +2,11 @@ package co.youverify.yvos_sdk.modules.livenesscheck
 
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import co.youverify.yvos_sdk.modules.vform.FormActivity
 
-internal class LivenessActivityObserver(val livenessCheckModule: LivenessCheckModule) :DefaultLifecycleObserver {
+internal class LivenessActivityObserver(private val livenessCheckModule: LivenessCheckModule) :DefaultLifecycleObserver {
 
+    private lateinit var livenessActivity: LivenessCheckActivity
     lateinit var option: LivenessOption
     var onSuccessCallback:(LivenessData?)->Unit={}
      var onFailureCallback:(LivenessData?)->Unit={}
@@ -13,6 +15,12 @@ internal class LivenessActivityObserver(val livenessCheckModule: LivenessCheckMo
     var onCancelCallback:(LivenessData?)->Unit={}
     private var onResumeCalled=false
 
+
+
+    override fun onCreate(owner: LifecycleOwner) {
+        livenessActivity=owner as LivenessCheckActivity
+
+    }
     override fun onStart(owner: LifecycleOwner) {
 
 
@@ -22,8 +30,7 @@ internal class LivenessActivityObserver(val livenessCheckModule: LivenessCheckMo
         onCloseCallback=option.onClose
         onCancelCallback=option.onCancel
 
-        val activity=owner as LivenessCheckActivity
-        activity.apply {
+        livenessActivity.apply {
             onSuccess=onSuccessCallback
             onClose=onCloseCallback
             onFailure=onFailureCallback
@@ -33,10 +40,15 @@ internal class LivenessActivityObserver(val livenessCheckModule: LivenessCheckMo
     }
 
     override fun onResume(owner: LifecycleOwner) {
-        //send liveness data only if onResume is being called for the first time
-        if (!onResumeCalled){
+
+        //send liveness data only if onResume is being called for the first time and camera permission has been granted
+        if (!onResumeCalled && livenessActivity.cameraPermissionGranted){
             onResumeCalled=true
             livenessCheckModule.sendLivenessUrl()
         }
+    }
+
+    fun sendLivenessUrl(){
+        livenessCheckModule.sendLivenessUrl()
     }
 }
