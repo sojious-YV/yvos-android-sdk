@@ -12,12 +12,14 @@ import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
+import androidx.lifecycle.lifecycleScope
 import co.youverify.yvos_sdk.R
 import co.youverify.yvos_sdk.components.ModalWindow
 import co.youverify.yvos_sdk.components.ProgressIndicator
@@ -25,7 +27,7 @@ import co.youverify.yvos_sdk.data.LivenessRequest
 import co.youverify.yvos_sdk.data.LivenessResponse
 import co.youverify.yvos_sdk.data.SdkServiceFactory
 import co.youverify.yvos_sdk.JsObject
-import co.youverify.yvos_sdk.modules.vform.VFormModule
+import co.youverify.yvos_sdk.components.LoadingDialog
 import co.youverify.yvos_sdk.theme.SdkTheme
 import co.youverify.yvos_sdk.util.NetworkResult
 import co.youverify.yvos_sdk.util.SdkException
@@ -33,14 +35,18 @@ import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
 import co.youverify.yvos_sdk.util.handleApi
 import com.google.gson.Gson
+import kotlinx.coroutines.launch
 import java.io.IOException
 
 class LivenessCheckActivity : AppCompatActivity() {
 
+    private val dialogVisible= mutableStateOf(false)
+    private var cameraPermissionChecked=false
     private val progressIndicatorVisible= mutableStateOf(true)
     var cameraPermissionGranted = false
     private set
     private lateinit var modalWindowView: ComposeView
+    private lateinit var loadingDialogView: ComposeView
     private lateinit var progressIndicatorView: ComposeView
     private var userName: String?=null
     private var pageReady = false
@@ -78,13 +84,14 @@ class LivenessCheckActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        checkForCameraPermission()
+        if (!cameraPermissionChecked){ checkForCameraPermission() }
     }
 
     private fun initializeViews() {
 
         webView=findViewById(R.id.webView_liveness)
         modalWindowView=findViewById(R.id.modalWindowView)
+        loadingDialogView=findViewById(R.id.loadingDialogView)
         //closeButton=findViewById(R.id.liveness_close_button)
         progressIndicatorView=findViewById(R.id.progressIndicatorView)
         /*closeButton.setOnClickListener{
@@ -117,10 +124,15 @@ class LivenessCheckActivity : AppCompatActivity() {
             }
 
         }
+
+        loadingDialogView.setContent {
+            LoadingDialog(visible = dialogVisible.value)
+        }
     }
 
     private fun checkForCameraPermission() {
 
+        cameraPermissionChecked=true
         if(checkSelfPermission(Manifest.permission.CAMERA)==PackageManager.PERMISSION_GRANTED){
             cameraPermissionGranted=true
 
@@ -207,7 +219,12 @@ class LivenessCheckActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         val url=intent?.getStringExtra(URL_TO_DISPLAY)
-        if (cameraPermissionGranted) webView.loadUrl(url!!)
+
+        if (cameraPermissionGranted) {
+            url?.let {
+                webView.loadUrl(it)
+            }
+        }
 
     }
 
@@ -235,11 +252,11 @@ class LivenessCheckActivity : AppCompatActivity() {
         if (data.contains(LivenessResultType.SUCCESS.id)) {
             Log.d("LivenessActivity",data)
             //closeButton.visibility=View.INVISIBLE
-            onSuccess(livenessResultData.data)
+            //onSuccess(livenessResultData.data)
             //progressBar.visibility=View.VISIBLE
-            /*lifecycleScope.launch {
+            lifecycleScope.launch {
                 postLivenessData(livenessResultData.data)
-            }*/
+            }
             return
         }
 
@@ -272,6 +289,8 @@ class LivenessCheckActivity : AppCompatActivity() {
 
     private suspend fun postLivenessData(data: LivenessData?) {
 
+        dialogVisible.value=true
+
         val option=LivenessCheckModule.livenessActivityObserver.option
 
         val request = LivenessRequest(
@@ -285,9 +304,9 @@ class LivenessCheckActivity : AppCompatActivity() {
 
         try {
             response=handleApi { SdkServiceFactory.sdkService(option).postLivenessData( livenessRequest = request) }
-            handleResponse(response)
+            handleResponse(response,data)
         }catch (e:IOException){
-
+            dialogVisible.value=false
             Snackbar.make(
                 webView.rootView,
                 "Could not connect to server, check your internet connection",
@@ -298,17 +317,28 @@ class LivenessCheckActivity : AppCompatActivity() {
     }
 
 
-    private fun handleResponse(response: NetworkResult<LivenessResponse>) {
+    private fun handleResponse(response: NetworkResult<LivenessResponse>, data: LivenessData) {
 
         if(response is NetworkResult.Success)   {
 
-            onSuccess(LivenessData(passed = response.data.data.passed,photo = response.data.data.faceImage))
+            dialogVisible.value=false
+            Toast.makeText(this,"Process  completed successfully",Toast.LENGTH_LONG).show()
+            Log.d(TAG,"Liveness data posted successfully")
+            Log.d(TAG, response.data.toString())
+            onSuccess(data)
+
+
             //finish()
         }
         if(response is NetworkResult.Error){
-            if (response.code==404)
+            Log.d(TAG,"Error occurred while attempting to post liveness data")
+            Log.d(TAG, response.toString())
+            dialogVisible.value=false
+            if (response.code==404){
                 throw SdkException("Invalid credentials- Either the  Public Merchant key is incorrect" +
                         " or the wrong 'dev' argument was supplied")
+            }
+
             else
                 throw SdkException(response.message?:"An unexpected error occurred")
         }

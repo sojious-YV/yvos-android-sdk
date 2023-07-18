@@ -42,19 +42,19 @@ fun validatePublicMerchantKeyAndAppearance(publicMerchantKey:String,appearance: 
     try{
         Color.parseColor(appearance.primaryColor)
     }catch (exception: IllegalArgumentException){
-        throw SdkException("The primary color string is invalid, it should be an hex code such as: \"#ffffff\" ")
+        throw SdkException("The primary color string is invalid, it should be a valid hex code such as: \"#ffffff\" ")
     }
 
     try{
         Color.parseColor(appearance.buttonTextColor)
     }catch (exception: IllegalArgumentException){
-        throw SdkException("The button text color string is invalid, it should be an hex code such as: \"#ffffff\" ")
+        throw SdkException("The button text color string is invalid, it should be a valid hex code such as: \"#ffffff\" ")
     }
 
     try{
         Color.parseColor(appearance.buttonBackgroundColor)
     }catch (exception: IllegalArgumentException){
-        throw SdkException("The button background color string is invalid, it should be an hex code such as: \"#ffffff\" ")
+        throw SdkException("The button background color string is invalid, it should be a valid hex code such as: \"#ffffff\" ")
     }
 }
 

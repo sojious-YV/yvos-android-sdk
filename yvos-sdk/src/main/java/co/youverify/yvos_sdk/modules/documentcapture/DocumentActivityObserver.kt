@@ -8,9 +8,9 @@ internal class DocumentActivityObserver(val documentCaptureModule: DocumentCaptu
 
     private lateinit var documentActivity: DocumentCaptureActivity
     lateinit var option: DocumentOption
-    var onSuccessCallback:(DocumentData?)->Unit={}
-     var onCloseCallback:(DocumentData?)->Unit={}
-    var onCancelCallback:(DocumentData?)->Unit={}
+    var onSuccessCallback:(String)->Unit={}
+     var onCloseCallback:(String)->Unit={}
+    var onCancelCallback:(String)->Unit={}
     private var onResumeCalled=false
 
 
@@ -33,10 +33,10 @@ internal class DocumentActivityObserver(val documentCaptureModule: DocumentCaptu
 
     override fun onResume(owner: LifecycleOwner) {
         //send liveness data only if onResume is being called for the first time and camera permission has been granted
-        if (!onResumeCalled && documentActivity.cameraPermissionGranted){
+        /*if (!onResumeCalled && documentActivity.cameraPermissionGranted){
             onResumeCalled=true
             documentCaptureModule.sendDocumentCaptureUrl()
-        }
+        }*/
     }
 
     fun sendDocumentCaptureUrl(){

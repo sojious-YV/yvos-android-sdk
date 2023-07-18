@@ -9,6 +9,7 @@ import co.youverify.yvos_sdk.R
 class LivenessOption(
     publicMerchantKey:String,
     dev: Boolean=false,
+    val sandBoxEnvironment:Boolean=false,
     metadata: Map<String, Any> = emptyMap(),
     val personalInfo: LivenessPersonalInfo?=null,
     val appearance: Appearance=Appearance(

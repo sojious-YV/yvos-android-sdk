@@ -75,7 +75,7 @@ fun ModalWindow(
                                 Text(
                                     text = greeting,
                                     modifier = modifier.padding(start = 8.dp, top = 20.dp,end=32.dp),
-                                    fontSize = 12.sp,
+                                    fontSize = 14.sp,
                                     color =Color(0XFF666666),
                                     fontWeight = FontWeight.Medium,
                                 )
@@ -98,7 +98,7 @@ fun ModalWindow(
                                     content = {
                                         Text(
                                             text = buttonText,
-                                            fontSize = 11.sp,
+                                            fontSize = 12.sp,
                                             fontWeight = FontWeight.Bold
                                         )
                                     },

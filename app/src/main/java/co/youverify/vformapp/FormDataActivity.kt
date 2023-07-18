@@ -38,7 +38,7 @@ class FormDataActivity : AppCompatActivity() {
            .append("${data?.fields}\n")
 
         titleTextView.text="Form Data"
-        contentTextView.text=sb
+        contentTextView.text=dataString
     }
 
 

@@ -7,6 +7,7 @@ class VFormOption(
     val vFormId: String,
     publicMerchantKey:String,
     val personalInfo:VFormPersonalInfo?=null,
+    val sandBoxEnvironment:Boolean=false,
     val appearance: Appearance=Appearance(
         greeting = "We will need to verify your identity. It will only take a moment.",
         actionText = "Verify Identity",

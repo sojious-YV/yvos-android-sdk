@@ -12,7 +12,6 @@ import com.google.gson.Gson
 class DocumentDataActivity : AppCompatActivity() {
 
 
-    private var data: DocumentData?=null
     private lateinit var contentTextView: TextView
     private lateinit var titleTextView: TextView
 
@@ -28,8 +27,8 @@ class DocumentDataActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun displayReturnedData() {
-        val dataString=intent.getStringExtra(RETURNED_DATA_STRING)
-         data=Gson().fromJson(dataString,DocumentData::class.java)
+        //val dataString=intent.getStringExtra(RETURNED_DATA_STRING)
+         /*data=Gson().fromJson(dataString,DocumentData::class.java)
        val  sb=SpannableStringBuilder()
            .bold { append("documentNumber: ") }
            .append("${data?.documentNumber}\n")
@@ -52,10 +51,10 @@ class DocumentDataActivity : AppCompatActivity() {
            .bold { append("fullDocumentImage: ") }
            .append("${data?.fullDocumentImage}\n")
            .bold { append("rawMRZString: ") }
-           .append("${data?.rawMRZString}\n")
+           .append("${data?.rawMRZString}\n")*/
 
         titleTextView.text="Document Data"
-        contentTextView.text=sb
+        contentTextView.text=MainViewmodel.documentData
     }
 
 

@@ -3,9 +3,7 @@ package co.youverify.yvos_sdk.modules.livenesscheck
 import android.content.Context
 import android.content.Intent
 import co.youverify.yvos_sdk.util.DEVELOPMENT_BASE_URL
-import co.youverify.yvos_sdk.util.ID_LENGTH
 import co.youverify.yvos_sdk.util.PRODUCTION_BASE_URL
-import co.youverify.yvos_sdk.util.SdkException
 import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
 import co.youverify.yvos_sdk.util.validatePublicMerchantKeyAndAppearance
@@ -47,7 +45,7 @@ class LivenessCheckModule  constructor(private val option: LivenessOption) {
 
     internal fun sendLivenessUrl() {
 
-        val baseUrl=if (option.dev) DEVELOPMENT_BASE_URL else PRODUCTION_BASE_URL
+        val baseUrl= if (option.dev) DEVELOPMENT_BASE_URL else PRODUCTION_BASE_URL
         val url="${baseUrl}/services/${option.publicMerchantKey}/liveness"
 
         mContext.startActivity(

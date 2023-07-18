@@ -42,10 +42,10 @@ internal class LivenessActivityObserver(private val livenessCheckModule: Livenes
     override fun onResume(owner: LifecycleOwner) {
 
         //send liveness data only if onResume is being called for the first time and camera permission has been granted
-        if (!onResumeCalled && livenessActivity.cameraPermissionGranted){
+       /* if (!onResumeCalled && livenessActivity.cameraPermissionGranted){
             onResumeCalled=true
             livenessCheckModule.sendLivenessUrl()
-        }
+        }*/
     }
 
     fun sendLivenessUrl(){

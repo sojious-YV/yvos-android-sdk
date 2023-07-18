@@ -41,11 +41,11 @@ internal class FormActivityObserver(private val vFormModule: VFormModule):Defaul
 
         //send liveness data only if onResume is being called for the first time and camera permission has been granted
         //and sendFormUrl() has not been called
-        if (!onResumeCalled && formActivity.cameraPermissionGranted && !formActivity.urlIsLoading){
+        /*if (!onResumeCalled && formActivity.cameraPermissionGranted && !formActivity.urlIsLoading){
             onResumeCalled=true
             formActivity.lifecycleScope.launch { vFormModule.sendFormUrl() }
 
-        }
+        }*/
     }
 
     fun sendFormUrl(){

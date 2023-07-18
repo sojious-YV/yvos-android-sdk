@@ -21,11 +21,10 @@ import androidx.compose.ui.window.Dialog
 import co.youverify.yvos_sdk.theme.yvColor
 
 @Composable
-fun LoadingDialog(modifier: Modifier = Modifier, message:String="Please wait..."){
+fun LoadingDialog( visible:Boolean, modifier: Modifier = Modifier, message:String="Please wait..."){
 
-    Dialog(
-        onDismissRequest = {},
-    ) {
+    if (visible)
+        Dialog(onDismissRequest = {},) {
         Row(
             modifier=modifier.padding(horizontal = 32.dp).fillMaxWidth().background(color = Color(0xFF595959), shape = RoundedCornerShape(4.dp)),
             verticalAlignment = Alignment.CenterVertically,
@@ -66,5 +65,5 @@ fun LoadingDialog(modifier: Modifier = Modifier, message:String="Please wait..."
 @Preview
 @Composable
 fun LoadingDialogPreview(){
-    LoadingDialog()
+    LoadingDialog(visible = true)
 }

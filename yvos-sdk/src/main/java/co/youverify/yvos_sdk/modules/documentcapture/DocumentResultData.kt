@@ -27,3 +27,9 @@ enum class DocumentResultType(val id: String) {
     CANCELLED("yvos:document:cancelled"),
     CLOSED("yvos:document:closed"),
 }
+
+data class CountryData(
+    val countryCode: String,
+    val idTypes: List<String>,
+    val province: List<String>
+)

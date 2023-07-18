@@ -12,6 +12,7 @@ import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.snackbar.Snackbar
@@ -26,6 +27,7 @@ import co.youverify.yvos_sdk.data.DocumentRequest
 import co.youverify.yvos_sdk.data.DocumentResponse
 import co.youverify.yvos_sdk.data.SdkServiceFactory
 import co.youverify.yvos_sdk.JsObject
+import co.youverify.yvos_sdk.components.LoadingDialog
 import co.youverify.yvos_sdk.modules.livenesscheck.LivenessCheckModule
 import co.youverify.yvos_sdk.theme.SdkTheme
 import co.youverify.yvos_sdk.util.NetworkResult
@@ -39,6 +41,8 @@ import java.io.IOException
 
 class DocumentCaptureActivity : AppCompatActivity() {
 
+    private val dialogVisible= mutableStateOf(false)
+    private var cameraPermissionChecked=false
     private val progressIndicatorVisible= mutableStateOf(true)
     private val url: String?=null
     var cameraPermissionGranted=false
@@ -49,12 +53,13 @@ class DocumentCaptureActivity : AppCompatActivity() {
     private var userName: String?=null
     private var pageReady: Boolean=false
     private lateinit var webView: WebView
+    private lateinit var loadingDialogView: ComposeView
     private val TAG="FormActivity"
     //private lateinit var closeButton: ImageView
     private val cameraPermissionRequestLauncher: ActivityResultLauncher<String> = createCameraPermissionRequestLauncher()
-    lateinit var onClose:(DocumentData?)->Unit
-    lateinit var onSuccess:(DocumentData?)->Unit
-    lateinit var onCancel:(DocumentData?)->Unit
+    lateinit var onClose:(String)->Unit
+    lateinit var onSuccess:(String)->Unit
+    lateinit var onCancel:(String)->Unit
 
 
 
@@ -81,7 +86,7 @@ class DocumentCaptureActivity : AppCompatActivity() {
 
     override fun onStart(){
         super.onStart()
-        checkForCameraPermission()
+        if (!cameraPermissionChecked){ checkForCameraPermission() }
     }
     private fun initializeViews() {
 
@@ -89,6 +94,7 @@ class DocumentCaptureActivity : AppCompatActivity() {
         modalWindowView=findViewById(R.id.modalWindowView)
         //closeButton=findViewById(R.id.document_close_button)
         progressIndicatorView=findViewById(R.id.progressIndicatorView)
+        loadingDialogView=findViewById(R.id.loadingDialogView)
 
         /*closeButton.setOnClickListener{
             finish()
@@ -102,6 +108,10 @@ class DocumentCaptureActivity : AppCompatActivity() {
         progressIndicatorView.setContent {
             ProgressIndicator(colorString =appearance.primaryColor , visible =progressIndicatorVisible.value )
         }
+        loadingDialogView.setContent {
+            LoadingDialog(visible = dialogVisible.value)
+        }
+
 
         modalWindowView.setContent {
             SdkTheme {
@@ -123,6 +133,7 @@ class DocumentCaptureActivity : AppCompatActivity() {
     }
 
     private fun checkForCameraPermission() {
+        cameraPermissionChecked=true
         if(checkSelfPermission(Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED){
 
             cameraPermissionGranted=true
@@ -154,14 +165,14 @@ class DocumentCaptureActivity : AppCompatActivity() {
     private fun setUpWebView() {
 
         webView.apply {
-            settings.javaScriptEnabled=true
-            settings.domStorageEnabled=true
-            settings.allowContentAccess=true
-            settings.allowFileAccess=true
-            settings.loadWithOverviewMode=true
-            settings.useWideViewPort=true
-            settings.builtInZoomControls=true
-            settings.displayZoomControls=false
+            settings.javaScriptEnabled = true
+            settings.domStorageEnabled = true
+            settings.allowContentAccess = true
+            settings.allowFileAccess = true
+            settings.loadWithOverviewMode = true
+            settings.useWideViewPort = true
+            settings.builtInZoomControls = true
+            settings.displayZoomControls = false
             addJavascriptInterface(JsObject(this@DocumentCaptureActivity),"Android")
             //setInitialScale(300)
             setInitialScale(1)
@@ -229,21 +240,21 @@ class DocumentCaptureActivity : AppCompatActivity() {
         val documentResultData:DocumentResultData= Gson().fromJson(data,DocumentResultData::class.java)
         if(data.contains(DocumentResultType.SUCCESS.id)){
                 Log.d("DocumentCaptureActivity",data)
-                onSuccess(documentResultData.data)
-                //postScannedData(documentResultData.data)
+                onSuccess(data)
+                postScannedData(documentResultData.data)
             return
 
         }
 
         if(data.contains(DocumentResultType.CLOSED.id)){
             Log.d("DocumentCaptureActivity",data)
-            onClose(documentResultData.data)
+            onClose(data)
             return
         }
 
         if(data.contains(DocumentResultType.CANCELLED.id)){
             Log.d("DocumentCaptureActivity",data)
-            onClose(documentResultData.data)
+            onClose(data)
             return
 
         }
@@ -252,12 +263,12 @@ class DocumentCaptureActivity : AppCompatActivity() {
 
     private fun postScannedData(data: DocumentData?) {
 
-        //progressBar.visibility= View.INVISIBLE
+        dialogVisible.value=true
         val option=DocumentCaptureModule.documentActivityObserver.option
         val request = DocumentRequest(
             publicMerchantID = option.publicMerchantKey,
             documentNumber = data?.documentNumber?:"",
-            documentType = "id"
+            documentType = "id_card"
         )
 
         var response: NetworkResult<DocumentResponse>
@@ -268,6 +279,7 @@ class DocumentCaptureActivity : AppCompatActivity() {
                 handleResponse(response,data)
             }catch (e: IOException){
                 //progressBar.visibility= View.INVISIBLE
+                dialogVisible.value=false
                 Snackbar.make(
                     webView.rootView,
                     "Could not connect to server, check your internet connection",
@@ -283,10 +295,15 @@ class DocumentCaptureActivity : AppCompatActivity() {
 
         if(response is NetworkResult.Success)   {
             //progressBar.visibility= View.INVISIBLE
+            dialogVisible.value=false
+            Toast.makeText(this,"Process successfully completed", Toast.LENGTH_LONG).show()
             //onSuccess(data)
             //finish()
         }
         if(response is NetworkResult.Error){
+            dialogVisible.value=false
+            Log.d(TAG,"Error occurred while attempting to post document data")
+            Log.d(TAG, response.toString())
             if (response.code==404)
                 throw SdkException("Invalid credentials- Either the  Public Merchant key is incorrect" +
                         " or the wrong 'dev' argument was supplied")

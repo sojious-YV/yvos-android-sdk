@@ -2,6 +2,7 @@ package co.youverify.yvos_sdk.modules.vform
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import co.youverify.yvos_sdk.data.AccessPointRequest
 import co.youverify.yvos_sdk.data.AccessPointResponse
@@ -81,8 +82,11 @@ class VFormModule  constructor(private val option: VFormOption) {
 
         if(response is NetworkResult.Success)   {
             //sendFormUrl(response.data.data.id,context)
+            val accessId=response.data.data.id
+            Log.d("FormActivity",accessId)
             val baseUrl=if (option.dev) DEVELOPMENT_BASE_URL else PRODUCTION_BASE_URL
-            val formUrl="${baseUrl}/v-forms/${option.vFormId}?accessId=${response.data.data.id}"
+            val formUrl=if(option.sandBoxEnvironment) "${baseUrl}/v-forms/${option.vFormId}?accessId=${accessId}&e=s"
+            else "${baseUrl}/v-forms/${option.vFormId}?accessId=${accessId}"
 
 
             context.startActivity(

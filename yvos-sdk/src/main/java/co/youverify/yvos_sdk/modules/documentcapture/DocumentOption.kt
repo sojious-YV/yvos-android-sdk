@@ -7,6 +7,7 @@ import co.youverify.yvos_sdk.Option
 
     publicMerchantKey:String,
     dev: Boolean=false,
+    val sandBoxEnvironment:Boolean=false,
     metadata: Map<String, Any> = emptyMap(),
     val personalInfo:DocumentPersonalInfo?=null,
     val appearance: Appearance=Appearance(
@@ -17,9 +18,9 @@ import co.youverify.yvos_sdk.Option
        primaryColor = "#46B2C8"
     ),
     val countries: List<Country>?=null,
-    val onSuccess: (DocumentData?) -> Unit,
-    val onCancel: (DocumentData?) -> Unit,
-    val onClose: (DocumentData?) -> Unit,
+    val onSuccess: (String) -> Unit,
+    val onCancel: (String) -> Unit,
+    val onClose: (String) -> Unit,
 
     ): Option(publicMerchantKey,dev,metadata)
 

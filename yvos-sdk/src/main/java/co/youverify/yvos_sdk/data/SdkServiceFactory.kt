@@ -7,7 +7,9 @@ import co.youverify.yvos_sdk.modules.vform.VFormOption
 import co.youverify.yvos_sdk.util.VFORM_DEVELOPMENT_API_BASE_URL
 import co.youverify.yvos_sdk.util.IDENTITY_DEVELOPMENT_API_BASE_URL
 import co.youverify.yvos_sdk.util.IDENTITY_PRODUCTION_API_BASE_URL
+import co.youverify.yvos_sdk.util.IDENTITY_STAGING_API_BASE_URL
 import co.youverify.yvos_sdk.util.VFORM_PRODUCTION_API_BASE_URL
+import co.youverify.yvos_sdk.util.VFORM_STAGING_API_BASE_URL
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -21,9 +23,18 @@ internal object SdkServiceFactory {
     fun sdkService(option: Option):SdkService{
 
        val baseUrl= when(option){
-            is VFormOption->if (option.dev) VFORM_DEVELOPMENT_API_BASE_URL else VFORM_PRODUCTION_API_BASE_URL
-            is LivenessOption ->if (option.dev) IDENTITY_DEVELOPMENT_API_BASE_URL else IDENTITY_PRODUCTION_API_BASE_URL
-            is DocumentOption ->if (option.dev) IDENTITY_DEVELOPMENT_API_BASE_URL else IDENTITY_PRODUCTION_API_BASE_URL
+            is VFormOption->{
+                if (option.dev && option.sandBoxEnvironment) VFORM_STAGING_API_BASE_URL
+                else if (!option.dev) VFORM_PRODUCTION_API_BASE_URL
+                else  VFORM_DEVELOPMENT_API_BASE_URL
+
+            }
+            is LivenessOption ->{
+                IDENTITY_DEVELOPMENT_API_BASE_URL
+            }
+            is DocumentOption ->{
+                IDENTITY_DEVELOPMENT_API_BASE_URL
+            }
            else -> {""}
        }
 

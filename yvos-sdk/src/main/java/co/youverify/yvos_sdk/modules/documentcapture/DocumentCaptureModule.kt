@@ -2,17 +2,12 @@ package co.youverify.yvos_sdk.modules.documentcapture
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import co.youverify.yvos_sdk.util.DEVELOPMENT_BASE_URL
-import co.youverify.yvos_sdk.util.ID_LENGTH
 import co.youverify.yvos_sdk.util.PRODUCTION_BASE_URL
-import co.youverify.yvos_sdk.util.SdkException
 import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
 import co.youverify.yvos_sdk.util.validatePublicMerchantKeyAndAppearance
-import java.lang.IllegalArgumentException
-import java.nio.charset.Charset
-import kotlin.io.encoding.Base64
+
 
 class DocumentCaptureModule(private val option: DocumentOption) {
 
@@ -52,10 +47,37 @@ class DocumentCaptureModule(private val option: DocumentOption) {
 
     internal fun sendDocumentCaptureUrl() {
 
-        val baseUrl=if (option.dev) DEVELOPMENT_BASE_URL else PRODUCTION_BASE_URL
+        val baseUrl= if (option.dev) DEVELOPMENT_BASE_URL else PRODUCTION_BASE_URL
         val primaryColorByteArray=option.appearance.primaryColor.toByteArray(Charsets.US_ASCII)
         val primaryColorBase64String=android.util.Base64.encodeToString(primaryColorByteArray,android.util.Base64.DEFAULT)
         val countries=""
+        /*val countries1 = """
+    [
+        {
+            "countryCode": "NG",
+            "idTypes": [
+                "passport",
+                "Residence Permit",
+                "Driving Licence",
+                "Driver License/Public Services Card (Combined)",
+                "NIN"
+            ],
+            "province": []
+        },
+        {
+            "countryCode": "ca",
+            "idTypes": [
+                "passport",
+                "Residence Permit",
+                "Driving Licence",
+                "Driver License/Public Services Card (Combined)",
+                " Citizenship   Certificate ",
+                "nin"
+            ],
+            "province": [" Alberta ","Quebec"]
+        }
+    ]
+""".trimIndent()*/
         val url="${baseUrl}/services/${option.publicMerchantKey}/document?countries=${countries}&primaryColor=$primaryColorBase64String"
 
 
