@@ -1,18 +1,18 @@
 package co.youverify.yvos_sdk.modules.vform
 
-data class VFormResultData(
+internal data class VFormResultData(
     val data: Data?,
     val id: String
 )
 
-data class Data(
-    val entry: VFormEntryData?
+internal data class Data(
+    val entry: FormEntry?
 )
-data class VFormEntryData(
+internal data class FormEntry(
     val id: String,
     val fields: List<Map<String, Any?>>
 )
-enum class FormResultType(val id: String) {
+internal enum class FormResultType(val id: kotlin.String) {
     SUCCESS("yvos:vform:submit-success"),
     FAILURE("yvos:vform:submit-failed"),
     COMPLETED("yvos:vform:submit-completed"),

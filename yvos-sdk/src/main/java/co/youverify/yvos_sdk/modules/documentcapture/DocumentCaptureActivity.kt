@@ -28,10 +28,10 @@ import co.youverify.yvos_sdk.data.DocumentResponse
 import co.youverify.yvos_sdk.data.SdkServiceFactory
 import co.youverify.yvos_sdk.JsObject
 import co.youverify.yvos_sdk.components.LoadingDialog
-import co.youverify.yvos_sdk.modules.livenesscheck.LivenessCheckModule
+import co.youverify.yvos_sdk.exceptions.InvalidCredentialsException
+import co.youverify.yvos_sdk.exceptions.SdkException
 import co.youverify.yvos_sdk.theme.SdkTheme
 import co.youverify.yvos_sdk.util.NetworkResult
-import co.youverify.yvos_sdk.util.SdkException
 import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
 import co.youverify.yvos_sdk.util.handleApi
@@ -39,7 +39,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-class DocumentCaptureActivity : AppCompatActivity() {
+internal class DocumentCaptureActivity : AppCompatActivity() {
 
     private val dialogVisible= mutableStateOf(false)
     private var cameraPermissionChecked=false
@@ -57,9 +57,9 @@ class DocumentCaptureActivity : AppCompatActivity() {
     private val TAG="FormActivity"
     //private lateinit var closeButton: ImageView
     private val cameraPermissionRequestLauncher: ActivityResultLauncher<String> = createCameraPermissionRequestLauncher()
-    lateinit var onClose:(String)->Unit
-    lateinit var onSuccess:(String)->Unit
-    lateinit var onCancel:(String)->Unit
+    lateinit var onClose:()->Unit
+    lateinit var onSuccess:(DocumentData)->Unit
+    lateinit var onCancel:()->Unit
 
 
 
@@ -240,28 +240,27 @@ class DocumentCaptureActivity : AppCompatActivity() {
         val documentResultData:DocumentResultData= Gson().fromJson(data,DocumentResultData::class.java)
         if(data.contains(DocumentResultType.SUCCESS.id)){
                 Log.d("DocumentCaptureActivity",data)
-                onSuccess(data)
-                postScannedData(documentResultData.data)
+                postScannedData(documentResultData.data!!)
             return
 
         }
 
         if(data.contains(DocumentResultType.CLOSED.id)){
             Log.d("DocumentCaptureActivity",data)
-            onClose(data)
+            onClose()
             return
         }
 
         if(data.contains(DocumentResultType.CANCELLED.id)){
             Log.d("DocumentCaptureActivity",data)
-            onClose(data)
+            onClose()
             return
 
         }
 
     }
 
-    private fun postScannedData(data: DocumentData?) {
+    private fun postScannedData(data: DocumentData) {
 
         dialogVisible.value=true
         val option=DocumentCaptureModule.documentActivityObserver.option
@@ -291,21 +290,20 @@ class DocumentCaptureActivity : AppCompatActivity() {
 
     }
 
-    private fun handleResponse(response: NetworkResult<DocumentResponse>, data: DocumentData?) {
+    private fun handleResponse(response: NetworkResult<DocumentResponse>, data: DocumentData) {
 
         if(response is NetworkResult.Success)   {
-            //progressBar.visibility= View.INVISIBLE
             dialogVisible.value=false
             Toast.makeText(this,"Process successfully completed", Toast.LENGTH_LONG).show()
-            //onSuccess(data)
-            //finish()
+            onSuccess(data)
+
         }
         if(response is NetworkResult.Error){
             dialogVisible.value=false
             Log.d(TAG,"Error occurred while attempting to post document data")
             Log.d(TAG, response.toString())
             if (response.code==404)
-                throw SdkException("Invalid credentials- Either the  Public Merchant key is incorrect" +
+                throw InvalidCredentialsException("Either the  Public Merchant key is incorrect" +
                         " or the wrong 'dev' argument was supplied")
             else
                 throw SdkException(response.message?:"An unexpected error occurred")

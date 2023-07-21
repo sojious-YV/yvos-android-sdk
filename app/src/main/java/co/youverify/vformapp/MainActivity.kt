@@ -5,19 +5,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import co.youverify.yvos_sdk.Appearance
 import co.youverify.yvos_sdk.YouverifySdk
+import co.youverify.yvos_sdk.modules.documentcapture.DocumentData
 import co.youverify.yvos_sdk.modules.documentcapture.DocumentOption
 import co.youverify.yvos_sdk.modules.documentcapture.DocumentPersonalInfo
 import co.youverify.yvos_sdk.modules.livenesscheck.LivenessData
 import co.youverify.yvos_sdk.modules.livenesscheck.LivenessOption
 import co.youverify.yvos_sdk.modules.livenesscheck.LivenessPersonalInfo
-import co.youverify.yvos_sdk.modules.vform.VFormEntryData
 import co.youverify.yvos_sdk.modules.vform.VFormOption
 import co.youverify.yvos_sdk.modules.vform.VFormPersonalInfo
 import com.google.gson.Gson
@@ -32,8 +29,8 @@ class MainActivity : AppCompatActivity() {
     private var formclicked: Boolean=false
     private var documentClicked: Boolean=false
     private lateinit var showDataButton: Button
-    private var mFormData: VFormEntryData?=null
-    private var mDocumentData: String=""
+    private var mFormData: String?=null
+    private var mDocumentData: DocumentData?=null
     private var mLivenessData: LivenessData?=null
     lateinit var progressBar:ProgressBar
     lateinit var formButton: Button
@@ -96,23 +93,15 @@ class MainActivity : AppCompatActivity() {
 
 
         if (livenessClicked){
-            val data=Gson().toJson(mLivenessData)
-            startActivity(
-                Intent(this,LivenessDataActivity::class.java).apply { putExtra(RETURNED_DATA_STRING,data) }
-            )
+            MainViewmodel.livenessData=mLivenessData
+            startActivity(Intent(this,LivenessDataActivity::class.java))
             return
         }
 
         if (documentClicked){
 
-            //val data=Gson().toJson(mDocumentData)
-
             MainViewmodel.documentData=mDocumentData
             startActivity(Intent(this,DocumentDataActivity::class.java))
-           // return
-            //textView_dt.text=mDocumentData
-            //layout2.visibility= View.VISIBLE
-            //Toast.makeText(this,mDocumentData,Toast.LENGTH_LONG).show()
         }
 
     }
@@ -141,7 +130,7 @@ class MainActivity : AppCompatActivity() {
             onCompleted={vformData ->
                // mFormData=vformData
                         },
-            onFailed={vformData -> mFormData=vformData},
+            onFailed={},
             personalInfo = if (inputData.firstName.isNotEmpty() && inputData.lastName.isEmpty()){
                 VFormPersonalInfo(
                     firstName = inputData.firstName,
@@ -184,6 +173,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun useLivenessModule(){
 
+        if (MainViewmodel.livenessData!=null) MainViewmodel.livenessData=null
+
         val greeting=inputData.greeting.ifEmpty { "We will need to carry out a liveness check. It will only take a moment." }
         val actionText=inputData.actionText.ifEmpty { "Start Liveness Test" }
         val buttonBackgroundColor=inputData.buttonBackGroundColor.ifEmpty { "#46B2C8" }
@@ -194,11 +185,11 @@ class MainActivity : AppCompatActivity() {
             publicMerchantKey = inputData.businessId.ifEmpty { "61d880f1e8e15aaf24558f1a" },
             //publicMerchantKey = "6222a5ed3e7a41c29c031ecc",
             dev = true,
-            onClose = { livenessData -> mLivenessData=livenessData },
-            onSuccess = {livenessData -> mLivenessData=livenessData },
-            onFailure = {livenessData -> mLivenessData=livenessData },
-            onCancel = {livenessData ->mLivenessData=livenessData },
-            onRetry = {livenessData -> mLivenessData=livenessData },
+            onClose = {},
+            onSuccess = {livenessData -> mLivenessData=livenessData},
+            onFailure = {},
+            onCancel = {},
+            onRetry = {},
             personalInfo = if (inputData.firstName.isNotEmpty()){
                 LivenessPersonalInfo(firstName = inputData.firstName)
             }else{null},
@@ -221,6 +212,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun useDocumentCaptureModule(){
 
+        if (MainViewmodel.documentData!=null) MainViewmodel.documentData=null
+
         val greeting=inputData.greeting.ifEmpty { "We will need to carry out a  document capture. It will only take a moment." }
         val actionText=inputData.actionText.ifEmpty { "Start Document Capture" }
         val buttonBackgroundColor=inputData.buttonBackGroundColor.ifEmpty { "#46B2C8" }
@@ -233,11 +226,11 @@ class MainActivity : AppCompatActivity() {
             //publicMerchantKey = "6222a5ed3e7a41c29c031ecc",
             //dev = true,
             dev=false,
-            onClose = {documentData -> mDocumentData=documentData },
+            onClose = {},
             onSuccess = {documentData ->
                 mDocumentData=documentData
                         },
-            onCancel ={documentData ->mDocumentData=documentData},
+            onCancel ={},
             personalInfo = if (inputData.firstName.isNotEmpty()){
                 DocumentPersonalInfo(firstName = inputData.firstName)
             }else{null},

@@ -11,13 +11,20 @@ import co.youverify.yvos_sdk.data.UserDetail
 import co.youverify.yvos_sdk.util.DEVELOPMENT_BASE_URL
 import co.youverify.yvos_sdk.util.PRODUCTION_BASE_URL
 import co.youverify.yvos_sdk.util.ID_LENGTH
+import co.youverify.yvos_sdk.exceptions.InvalidArgumentException
+import co.youverify.yvos_sdk.exceptions.InvalidCredentialsException
+import co.youverify.yvos_sdk.exceptions.SdkException
 import co.youverify.yvos_sdk.util.NetworkResult
-import co.youverify.yvos_sdk.util.SdkException
 import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
 import co.youverify.yvos_sdk.util.handleApi
 import co.youverify.yvos_sdk.util.validatePublicMerchantKeyAndAppearance
 
+/**
+ * This class enables access to the Vform service.
+ * @property option holds the appearance specifications and the information needed to display the appropriate form.
+ * @constructor creates an instant of this module whose configuration is specified by the "option" property.
+ */
 class VFormModule  constructor(private val option: VFormOption) {
 
 
@@ -28,11 +35,12 @@ class VFormModule  constructor(private val option: VFormOption) {
      }
 
     /**
-     * Displays the  vForm associated with this vFormModule
-     * Throw SdkException if the provided form Id or public merchant key is invalid or if an attempt is made to display
-     * a form created in production environment while setting "dev" option to true and vice-versa
+     * Starts the vForm service by attempting to display the form that corresponds to the "formId" supplied in the "option" property.
+     * @throws InvalidCredentialsException if the "publicMerchantKey" specified in the option is invalid or if the wrong value was supplied for the "dev" argument.
+     * @throws InvalidArgumentException if an invalid color string was supplied in the "appearance" configuration.
+     * @param context the context object to be passed.
      */
-    @Throws(Exception::class)
+
     fun start(context: Context) {
 
 
@@ -98,7 +106,7 @@ class VFormModule  constructor(private val option: VFormOption) {
 
         if(response is NetworkResult.Error){
             if (response.code==404)
-                throw SdkException("Invalid credentials- Either the form Id or Public Merchant key is incorrect" +
+                throw InvalidCredentialsException("Invalid credentials- Either the form Id or Public Merchant key is incorrect" +
                         " or the wrong 'dev' argument was supplied")
             else
                 throw SdkException(response.message?:"An unexpected error occurred")
@@ -121,7 +129,7 @@ class VFormModule  constructor(private val option: VFormOption) {
         )
 
         if (option.vFormId.length!= ID_LENGTH || option.vFormId.isEmpty())
-            throw SdkException("vFormId cannot be empty and must be 24 characters long")
+            throw InvalidCredentialsException("vFormId cannot be empty and must be 24 characters long")
 
 
         if (personalInfo!=null){
@@ -130,7 +138,7 @@ class VFormModule  constructor(private val option: VFormOption) {
                 personalInfo.middleName?.isEmpty()==true || personalInfo.email?.isEmpty()==true ||
                 personalInfo.mobile?.isEmpty()==true
             )
-                throw SdkException("Personal Information fields cannot be empty")
+                throw InvalidArgumentException("Personal Information fields cannot be empty")
         }
         
 

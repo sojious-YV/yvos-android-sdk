@@ -25,21 +25,21 @@ import co.youverify.yvos_sdk.JsObject
 import co.youverify.yvos_sdk.R
 import co.youverify.yvos_sdk.components.ModalWindow
 import co.youverify.yvos_sdk.components.ProgressIndicator
+import co.youverify.yvos_sdk.exceptions.SdkException
 import co.youverify.yvos_sdk.theme.SdkTheme
-import co.youverify.yvos_sdk.util.SdkException
 import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 
-class FormActivity : AppCompatActivity() {
+internal class FormActivity : AppCompatActivity() {
 
     private var cameraPermissionChecked: Boolean=false
     var urlIsLoading: Boolean = false
     private set
     private var pageIsAlreadyLoading: Boolean=false
-    private var url: String?=null
-    private var userName: String?=null
+    private var url: kotlin.String?=null
+    private var userName: kotlin.String?=null
     var cameraPermissionGranted: Boolean=false
     private set
     lateinit var modalWindowView: ComposeView
@@ -52,10 +52,10 @@ class FormActivity : AppCompatActivity() {
     private lateinit var progressIndicatorView: ComposeView
     private var fileChooserValueCallback: ValueCallback<Array<Uri>>? = null
     private var fileChooserLauncher: ActivityResultLauncher<Intent> = createFileChooserLauncher()
-    private val cameraPermissionRequestLauncher:ActivityResultLauncher<String> = createCameraPermissionRequestLauncher()
-    lateinit var onFailed:(VFormEntryData?)->Unit
-    lateinit var onSuccess:(VFormEntryData?)->Unit
-    lateinit var onCompleted:(VFormEntryData?)->Unit
+    private val cameraPermissionRequestLauncher:ActivityResultLauncher<kotlin.String> = createCameraPermissionRequestLauncher()
+    lateinit var onFailed:()->Unit
+    lateinit var onSuccess:(String)->Unit
+    lateinit var onCompleted:(String)->Unit
 
 
 
@@ -170,11 +170,11 @@ class FormActivity : AppCompatActivity() {
             //Set up the Webview client
             webViewClient= object : WebViewClient() {
 
-                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                override fun onPageStarted(view: WebView?, url: kotlin.String?, favicon: Bitmap?) {
                     pageIsAlreadyLoading=true
                 }
 
-                override fun onPageFinished(view: WebView?, url: String?) {
+                override fun onPageFinished(view: WebView?, url: kotlin.String?) {
 
                     if (view?.progress==100){
 
@@ -237,7 +237,7 @@ class FormActivity : AppCompatActivity() {
     }
 
 
-    private fun createCameraPermissionRequestLauncher(): ActivityResultLauncher<String> =
+    private fun createCameraPermissionRequestLauncher(): ActivityResultLauncher<kotlin.String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             if (it){
                 cameraPermissionGranted=true
@@ -278,7 +278,7 @@ class FormActivity : AppCompatActivity() {
         }
 
 
-    fun onFormDataReceived(data: String) {
+    fun onFormDataReceived(data: kotlin.String) {
 
 
 
@@ -293,7 +293,7 @@ class FormActivity : AppCompatActivity() {
 
             Log.d("FormActivity",data)
             val formData= Gson().fromJson(data,VFormResultData::class.java)
-            onCompleted(formData.data?.entry)
+            onCompleted(data)
             return
 
         }
@@ -301,14 +301,14 @@ class FormActivity : AppCompatActivity() {
         if(data.contains(FormResultType.SUCCESS.id)){
             Log.d("FormActivity",data)
             val formData= Gson().fromJson(data,VFormResultData::class.java)
-            onSuccess(formData.data?.entry)
+            onSuccess(data)
             return
         }
 
         if(data.contains(FormResultType.FAILURE.id)){
             Log.d("FormActivity",data)
             val formData= Gson().fromJson(data,VFormResultData::class.java)
-            onFailed(formData.data?.entry)
+            onFailed()
             return
         }
 

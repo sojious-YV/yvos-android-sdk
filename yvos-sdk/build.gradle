@@ -2,6 +2,7 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+   // id  'org.jetbrains.dokka'
    // id "kotlin.plugin.serialization"
 
 }
@@ -42,8 +43,39 @@ android {
         kotlinCompilerExtensionVersion '1.4.6'
         //kotlinCompilerVersion '1.4.21'
     }
-
+    // dokkaHtml.mustRunAfter(':yvos-sdk:kaptReleaseKotlin')
 }
+
+/*tasks.named("dokkaHtml") {
+    // ..
+    // general configuration section
+    // ..
+
+    moduleName.set("YVOS-ANDROID-SDK")
+    outputDirectory.set(file("build/dokka/my_documentation"))
+
+
+    dokkaSourceSets.configureEach {
+        // ..
+        // Source set configuration section
+        // ..
+
+        for (def pkg : [".*components", ".*data", ".*di",".*theme",".*util"]) {
+
+            perPackageOption {
+
+
+                //matchingRegex.set(".*components")
+                matchingRegex.set(pkg)
+                suppress.set(true)
+                skipDeprecated.set(false)
+                reportUndocumented.set(false)
+                //documentedVisibilities.set([Visibility.PUBLIC])
+            }
+
+        }
+    }
+}*/
 
 dependencies {
 

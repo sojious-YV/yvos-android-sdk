@@ -8,9 +8,9 @@ internal class DocumentActivityObserver(val documentCaptureModule: DocumentCaptu
 
     private lateinit var documentActivity: DocumentCaptureActivity
     lateinit var option: DocumentOption
-    var onSuccessCallback:(String)->Unit={}
-     var onCloseCallback:(String)->Unit={}
-    var onCancelCallback:(String)->Unit={}
+    var onSuccessCallback:(DocumentData)->Unit={}
+     var onCloseCallback:()->Unit={}
+    var onCancelCallback:()->Unit={}
     private var onResumeCalled=false
 
 

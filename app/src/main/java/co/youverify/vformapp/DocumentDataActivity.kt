@@ -28,33 +28,34 @@ class DocumentDataActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun displayReturnedData() {
         //val dataString=intent.getStringExtra(RETURNED_DATA_STRING)
-         /*data=Gson().fromJson(dataString,DocumentData::class.java)
+         //data=Gson().fromJson(dataString,DocumentData::class.java)
+         val documentData=MainViewmodel.documentData
        val  sb=SpannableStringBuilder()
            .bold { append("documentNumber: ") }
-           .append("${data?.documentNumber}\n")
+           .append("${documentData?.documentNumber}\n")
            .bold { append("firstName: ") }
-           .append("${data?.firstName}\n")
+           .append("${documentData?.firstName}\n")
            .bold { append("lastNumber: ") }
-           .append("${data?.lastName}\n")
+           .append("${documentData?.lastName}\n")
            .bold { append("fullName: ") }
-           .append("${data?.fullName}\n")
+           .append("${documentData?.fullName}\n")
            .bold { append("dateOfBirthNumber: ") }
-           .append("${data?.dateOfBirth}\n")
+           .append("${documentData?.dateOfBirth}\n")
            .bold { append("dateOfExpiry: ") }
-           .append("${data?.dateOfExpiry}\n")
+           .append("${documentData?.dateOfExpiry}\n")
            .bold { append("gender: ") }
-           .append("${data?.gender}\n")
-           .bold { append("fullDocumentFrontImage: ") }
-           .append("${data?.fullDocumentFrontImage}\n")
-           .bold { append("fullDocumentBackImage: ") }
-           .append("${data?.fullDocumentBackImage}\n")
-           .bold { append("fullDocumentImage: ") }
-           .append("${data?.fullDocumentImage}\n")
-           .bold { append("rawMRZString: ") }
-           .append("${data?.rawMRZString}\n")*/
+           .append("${documentData?.gender}\n")
+           //.bold { append("fullDocumentFrontImage: ") }
+           //.append("${documentData?.fullDocumentFrontImage}\n")
+           //.bold { append("fullDocumentBackImage: ") }
+           //.append("${documentData?.fullDocumentBackImage}\n")
+           //.bold { append("fullDocumentImage: ") }
+           //.append("${documentData?.fullDocumentImage}\n")
+           //.bold { append("rawMRZString: ") }
+           //.append("${documentData?.rawMRZString}\n")
 
         titleTextView.text="Document Data"
-        contentTextView.text=MainViewmodel.documentData
+        contentTextView.text=sb
     }
 
 

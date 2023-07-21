@@ -1,14 +1,21 @@
-package co.youverify.yvos_sdk.modules.documentcapture
 
+package co.youverify.yvos_sdk.modules.documentcapture
 import android.content.Context
 import android.content.Intent
+import co.youverify.yvos_sdk.exceptions.InvalidArgumentException
+import co.youverify.yvos_sdk.exceptions.InvalidCredentialsException
 import co.youverify.yvos_sdk.util.DEVELOPMENT_BASE_URL
 import co.youverify.yvos_sdk.util.PRODUCTION_BASE_URL
 import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
 import co.youverify.yvos_sdk.util.validatePublicMerchantKeyAndAppearance
+import kotlin.jvm.Throws
 
-
+/**
+ * This class enables access to the Document capture service.
+ * @property option holds the appearance specifications and information needed by the Document capture service.
+ * @constructor creates an instant of this module whose configuration is specified by the "option" property.
+ */
 class DocumentCaptureModule(private val option: DocumentOption) {
 
     private lateinit var mContext: Context
@@ -18,11 +25,14 @@ class DocumentCaptureModule(private val option: DocumentOption) {
     }
 
     /**
-     * Displays the  vForm associated with this vFormModule
-     * Throw SdkException if the provided form Id or public merchant key is invalid or if an attempt is made to display
-     * a form created in production environment while setting "dev" option to true and vice-versa
+     * Starts the Document capture service.
+     * @throws InvalidCredentialsException if the "publicMerchantKey" specified in the option is invalid or if the wrong value was supplied for the "dev" argument.
+     * @throws InvalidArgumentException if an invalid color string was supplied in the "appearance" configuration.
+     * @param context the context object passed.
+     *
      */
-    @Throws(Exception::class)
+
+
     fun start(context: Context) {
 
         //initialize Activity observer
@@ -38,7 +48,7 @@ class DocumentCaptureModule(private val option: DocumentOption) {
 
         mContext=context
 
-        //validate formId and MerchantKey length
+        //validate the MerchantKey length and the Color String
         validateOption()
 
     }
@@ -51,33 +61,6 @@ class DocumentCaptureModule(private val option: DocumentOption) {
         val primaryColorByteArray=option.appearance.primaryColor.toByteArray(Charsets.US_ASCII)
         val primaryColorBase64String=android.util.Base64.encodeToString(primaryColorByteArray,android.util.Base64.DEFAULT)
         val countries=""
-        /*val countries1 = """
-    [
-        {
-            "countryCode": "NG",
-            "idTypes": [
-                "passport",
-                "Residence Permit",
-                "Driving Licence",
-                "Driver License/Public Services Card (Combined)",
-                "NIN"
-            ],
-            "province": []
-        },
-        {
-            "countryCode": "ca",
-            "idTypes": [
-                "passport",
-                "Residence Permit",
-                "Driving Licence",
-                "Driver License/Public Services Card (Combined)",
-                " Citizenship   Certificate ",
-                "nin"
-            ],
-            "province": [" Alberta ","Quebec"]
-        }
-    ]
-""".trimIndent()*/
         val url="${baseUrl}/services/${option.publicMerchantKey}/document?countries=${countries}&primaryColor=$primaryColorBase64String"
 
 

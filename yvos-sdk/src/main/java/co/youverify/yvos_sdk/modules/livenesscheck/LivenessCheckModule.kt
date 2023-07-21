@@ -3,11 +3,17 @@ package co.youverify.yvos_sdk.modules.livenesscheck
 import android.content.Context
 import android.content.Intent
 import co.youverify.yvos_sdk.util.DEVELOPMENT_BASE_URL
+import co.youverify.yvos_sdk.exceptions.InvalidArgumentException
+import co.youverify.yvos_sdk.exceptions.InvalidCredentialsException
 import co.youverify.yvos_sdk.util.PRODUCTION_BASE_URL
 import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
 import co.youverify.yvos_sdk.util.validatePublicMerchantKeyAndAppearance
-
+/**
+* This class enables access to the Livesness check service.
+* @property option holds the appearance specifications and information needed by the Liveness check service.
+* @constructor creates an instant of this module whose configuration is specified by the "option" property.
+*/
 class LivenessCheckModule  constructor(private val option: LivenessOption) {
 
 
@@ -18,11 +24,12 @@ class LivenessCheckModule  constructor(private val option: LivenessOption) {
      }
 
     /**
-     * Displays the  vForm associated with this vFormModule
-     * Throw SdkException if the provided form Id or public merchant key is invalid or if an attempt is made to display
-     * a form created in production environment while setting "dev" option to true and vice-versa
+     * Starts the Liveness check service.
+     * @throws InvalidCredentialsException if the "publicMerchantKey" specified in the option is invalid or if the wrong value was supplied for the "dev" argument.
+     * @throws InvalidArgumentException if an invalid color string was supplied in the "appearance" configuration.
+     * @param context the context object passed.
      */
-    @Throws(Exception::class)
+
      fun start(context: Context) {
 
 
@@ -37,7 +44,7 @@ class LivenessCheckModule  constructor(private val option: LivenessOption) {
             }
         )
 
-        //validate formId and MerchantKey length
+        //validate the MerchantKey length and the Color String
         validateOption()
     }
 

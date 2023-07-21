@@ -28,9 +28,10 @@ import co.youverify.yvos_sdk.data.LivenessResponse
 import co.youverify.yvos_sdk.data.SdkServiceFactory
 import co.youverify.yvos_sdk.JsObject
 import co.youverify.yvos_sdk.components.LoadingDialog
+import co.youverify.yvos_sdk.exceptions.InvalidCredentialsException
+import co.youverify.yvos_sdk.exceptions.SdkException
 import co.youverify.yvos_sdk.theme.SdkTheme
 import co.youverify.yvos_sdk.util.NetworkResult
-import co.youverify.yvos_sdk.util.SdkException
 import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
 import co.youverify.yvos_sdk.util.handleApi
@@ -38,7 +39,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-class LivenessCheckActivity : AppCompatActivity() {
+internal class LivenessCheckActivity : AppCompatActivity() {
 
     private val dialogVisible= mutableStateOf(false)
     private var cameraPermissionChecked=false
@@ -55,11 +56,11 @@ class LivenessCheckActivity : AppCompatActivity() {
     private val TAG="FormActivity"
     private val modalWindowVisible = mutableStateOf(false)
     private val cameraPermissionRequestLauncher: ActivityResultLauncher<String> = createCameraPermissionRequestLauncher()
-    lateinit var onClose:(LivenessData?)->Unit
-    lateinit var onFailure:(LivenessData?)->Unit
-    lateinit var onSuccess:(LivenessData?)->Unit
-    lateinit var onRetry:(LivenessData?)->Unit
-    lateinit var onCancel:(LivenessData?)->Unit
+    lateinit var onClose:()->Unit
+    lateinit var onFailure:()->Unit
+    lateinit var onSuccess:(LivenessData)->Unit
+    lateinit var onRetry:()->Unit
+    lateinit var onCancel:()->Unit
 
 
 
@@ -92,11 +93,8 @@ class LivenessCheckActivity : AppCompatActivity() {
         webView=findViewById(R.id.webView_liveness)
         modalWindowView=findViewById(R.id.modalWindowView)
         loadingDialogView=findViewById(R.id.loadingDialogView)
-        //closeButton=findViewById(R.id.liveness_close_button)
         progressIndicatorView=findViewById(R.id.progressIndicatorView)
-        /*closeButton.setOnClickListener{
-            finish()
-        }*/
+
         val appearance=LivenessCheckModule.livenessActivityObserver.option.appearance
 
 
@@ -239,21 +237,17 @@ class LivenessCheckActivity : AppCompatActivity() {
         val livenessResultData=Gson().fromJson(data,LivenessResultData::class.java)
 
         if(data.contains(LivenessResultType.FAILED.id) ){
-            //closeButton.visibility=View.INVISIBLE
             Log.d("LivenessActivity",data)
             //lifecycleScope.launch { delay(500) }
-            onFailure(livenessResultData.data)
+            onFailure()
             return
 
-            //finish()
         }
 
 
         if (data.contains(LivenessResultType.SUCCESS.id)) {
             Log.d("LivenessActivity",data)
-            //closeButton.visibility=View.INVISIBLE
-            //onSuccess(livenessResultData.data)
-            //progressBar.visibility=View.VISIBLE
+
             lifecycleScope.launch {
                 postLivenessData(livenessResultData.data)
             }
@@ -264,25 +258,20 @@ class LivenessCheckActivity : AppCompatActivity() {
 
         if(data.contains(LivenessResultType.CANCELLED.id)) {
             Log.d("LivenessActivity",data)
-            //closeButton.visibility=View.VISIBLE
-            onCancel(livenessResultData.data)
+            onCancel()
             return
 
         }
 
             if(data.contains(LivenessResultType.CLOSED.id)){
                 Log.d("LivenessActivity",data)
-                //closeButton.visibility=View.VISIBLE
-                onClose(livenessResultData.data)
+                onClose()
                 return
-                //finish()
             }
             if (data.contains(LivenessResultType.RETRY.id)){
                 Log.d("LivenessActivity",data)
-                //closeButton.visibility=View.VISIBLE
-                onRetry(livenessResultData.data)
+                onRetry()
                 return
-                //finish()
             }
         }
 
@@ -335,7 +324,7 @@ class LivenessCheckActivity : AppCompatActivity() {
             Log.d(TAG, response.toString())
             dialogVisible.value=false
             if (response.code==404){
-                throw SdkException("Invalid credentials- Either the  Public Merchant key is incorrect" +
+                throw InvalidCredentialsException("Either the  Public Merchant key is incorrect" +
                         " or the wrong 'dev' argument was supplied")
             }
 

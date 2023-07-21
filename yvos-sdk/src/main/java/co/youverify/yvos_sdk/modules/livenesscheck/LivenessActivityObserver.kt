@@ -8,12 +8,12 @@ internal class LivenessActivityObserver(private val livenessCheckModule: Livenes
 
     private lateinit var livenessActivity: LivenessCheckActivity
     lateinit var option: LivenessOption
-    var onSuccessCallback:(LivenessData?)->Unit={}
-     var onFailureCallback:(LivenessData?)->Unit={}
-     var onCloseCallback:(LivenessData?)->Unit={}
-    var onRetryCallback:(LivenessData?)->Unit={}
-    var onCancelCallback:(LivenessData?)->Unit={}
-    private var onResumeCalled=false
+    var onSuccessCallback:(LivenessData)->Unit={}
+     var onFailureCallback:()->Unit={}
+     var onCloseCallback:()->Unit={}
+    var onRetryCallback:()->Unit={}
+    var onCancelCallback:()->Unit={}
+    //private var onResumeCalled=false
 
 
 

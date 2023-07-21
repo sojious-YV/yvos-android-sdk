@@ -28,13 +28,14 @@ class LivenessDataActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun displayReturnedData() {
-        val dataString=intent.getStringExtra(RETURNED_DATA_STRING)
-        data=Gson().fromJson(dataString,LivenessData::class.java)
+        //val dataString=intent.getStringExtra(RETURNED_DATA_STRING)
+        //data=Gson().fromJson(dataString,LivenessData::class.java)
+        val livenessData=MainViewmodel.livenessData
         val  sb= SpannableStringBuilder()
             .bold { append("passed: ") }
-            .append("${data?.passed}\n\n")
+            .append("${livenessData?.passed?:false}\n\n")
             .bold { append("photo: ") }
-            .append("${data?.photo}")
+            .append("${livenessData?.photo}")
 
 
         titleTextView.text="Liveness Data"

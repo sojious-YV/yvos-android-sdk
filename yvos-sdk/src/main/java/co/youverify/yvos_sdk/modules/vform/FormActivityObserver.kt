@@ -3,17 +3,15 @@ package co.youverify.yvos_sdk.modules.vform
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import co.youverify.yvos_sdk.modules.livenesscheck.LivenessCheckActivity
-import co.youverify.yvos_sdk.modules.livenesscheck.LivenessCheckModule
 import kotlinx.coroutines.launch
 
 internal class FormActivityObserver(private val vFormModule: VFormModule):DefaultLifecycleObserver {
 
-    private var onResumeCalled=false
+    //private var onResumeCalled=false
 
-     var onSuccessCallback:(VFormEntryData?)->Unit={}
-     var onFailedCallback:(VFormEntryData?)->Unit={}
-    var onCompletedCallback:(VFormEntryData?)->Unit={}
+     var onSuccessCallback:(String)->Unit={}
+     var onFailedCallback:()->Unit={}
+    var onCompletedCallback:(String)->Unit={}
     lateinit var option:VFormOption
     lateinit var formActivity:FormActivity
 
