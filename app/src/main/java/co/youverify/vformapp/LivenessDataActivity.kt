@@ -6,13 +6,11 @@ import android.text.SpannableStringBuilder
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.bold
-import co.youverify.yvos_sdk.modules.livenesscheck.LivenessData
-import com.google.gson.Gson
 
 class LivenessDataActivity : AppCompatActivity() {
 
 
-    private var data: LivenessData?=null
+    //private var data: LivenessData?=null
     private lateinit var contentTextView: TextView
     private lateinit var titleTextView: TextView
 
@@ -28,14 +26,15 @@ class LivenessDataActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun displayReturnedData() {
-        //val dataString=intent.getStringExtra(RETURNED_DATA_STRING)
+        val dataString=intent.getStringExtra(RETURNED_DATA_STRING)
+        val passed = dataString.isNullOrEmpty()
         //data=Gson().fromJson(dataString,LivenessData::class.java)
-        val livenessData=MainViewmodel.livenessData
+       // val livenessData=MainViewmodel.livenessData
         val  sb= SpannableStringBuilder()
             .bold { append("passed: ") }
-            .append("${livenessData?.passed?:false}\n\n")
+            .append("${passed}\n\n")
             .bold { append("photo: ") }
-            .append("${livenessData?.photo}")
+            .append("$dataString")
 
 
         titleTextView.text="Liveness Data"

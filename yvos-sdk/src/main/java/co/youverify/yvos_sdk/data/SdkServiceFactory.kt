@@ -1,13 +1,11 @@
 package co.youverify.yvos_sdk.data
 
-import co.youverify.yvos_sdk.Option
-import co.youverify.yvos_sdk.modules.documentcapture.DocumentOption
-import co.youverify.yvos_sdk.modules.livenesscheck.LivenessOption
-import co.youverify.yvos_sdk.modules.vform.VFormOption
+import co.youverify.yvos_sdk.SdkModule
+import co.youverify.yvos_sdk.modules.documentcapture.DocumentCaptureModule
+import co.youverify.yvos_sdk.modules.livenesscheck.LivenessCheckModule
+import co.youverify.yvos_sdk.modules.vform.VFormModule
 import co.youverify.yvos_sdk.util.VFORM_DEVELOPMENT_API_BASE_URL
 import co.youverify.yvos_sdk.util.IDENTITY_DEVELOPMENT_API_BASE_URL
-import co.youverify.yvos_sdk.util.IDENTITY_PRODUCTION_API_BASE_URL
-import co.youverify.yvos_sdk.util.IDENTITY_STAGING_API_BASE_URL
 import co.youverify.yvos_sdk.util.VFORM_PRODUCTION_API_BASE_URL
 import co.youverify.yvos_sdk.util.VFORM_STAGING_API_BASE_URL
 import okhttp3.OkHttpClient
@@ -20,19 +18,19 @@ internal object SdkServiceFactory {
 
      private val service:SdkService?=null
 
-    fun sdkService(option: Option):SdkService{
+    fun sdkService(module: SdkModule):SdkService{
 
-       val baseUrl= when(option){
-            is VFormOption->{
-                if (option.dev && option.sandBoxEnvironment) VFORM_STAGING_API_BASE_URL
-                else if (!option.dev) VFORM_PRODUCTION_API_BASE_URL
+       val baseUrl= when(module){
+            is VFormModule->{
+                if (module.dev && module.sandBoxEnvironment) VFORM_STAGING_API_BASE_URL
+                else if (!module.dev) VFORM_PRODUCTION_API_BASE_URL
                 else  VFORM_DEVELOPMENT_API_BASE_URL
 
             }
-            is LivenessOption ->{
+            is LivenessCheckModule ->{
                 IDENTITY_DEVELOPMENT_API_BASE_URL
             }
-            is DocumentOption ->{
+            is DocumentCaptureModule->{
                 IDENTITY_DEVELOPMENT_API_BASE_URL
             }
            else -> {""}

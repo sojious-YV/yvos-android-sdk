@@ -11,6 +11,7 @@ internal const val IDENTITY_PRODUCTION_API_BASE_URL="https://identity.svc.youver
 internal const val IDENTITY_DEVELOPMENT_API_BASE_URL="https://identity.dev.svc.youverify.co/"
 internal const val IDENTITY_STAGING_API_BASE_URL="https://identity.staging.svc.youverify.co/"
 internal const val USER_NAME="USERNAME"
+internal const val FINISH_ACTIVITY="FINISH_ACTIVITY"
 
 
 //https://os.dev.youverify.co/v-forms/6418559951282f74e34472e9?accessId=6480b43bc60ede4e5dfbf2db

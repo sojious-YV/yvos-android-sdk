@@ -5,14 +5,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
-internal class FormActivityObserver(private val vFormModule: VFormModule):DefaultLifecycleObserver {
+internal class FormActivityObserver(val vFormModule: VFormModule):DefaultLifecycleObserver {
 
     //private var onResumeCalled=false
 
      var onSuccessCallback:(String)->Unit={}
      var onFailedCallback:()->Unit={}
     var onCompletedCallback:(String)->Unit={}
-    lateinit var option:VFormOption
+    //lateinit var option:VFormOption
     lateinit var formActivity:FormActivity
 
 
@@ -23,9 +23,9 @@ internal class FormActivityObserver(private val vFormModule: VFormModule):Defaul
 
     override fun onStart(owner: LifecycleOwner) {
 
-        onSuccessCallback=option.onSuccess
-        onFailedCallback=option.onFailed
-        onCompletedCallback=option.onCompleted
+        onSuccessCallback=vFormModule.onSuccess
+        onFailedCallback=vFormModule.onFailed
+        onCompletedCallback=vFormModule.onCompleted
 
 
         formActivity.apply {

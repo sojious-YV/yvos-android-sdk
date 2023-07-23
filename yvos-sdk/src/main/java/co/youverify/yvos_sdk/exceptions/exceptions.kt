@@ -16,4 +16,4 @@ class InvalidCredentialsException(errorMessage: String):SdkException(errorMessag
  * The exception that indicates the the user supplied an invalid argument to some method or constructor of the SDK classes
  * @param errorMessage  the message that describe the exception
  */
-class InvalidArgumentException(errorMessage: String):SdkException(errorMessage)
+//class InvalidArgumentException(errorMessage: String):SdkException(errorMessage)

@@ -27,6 +27,7 @@ import co.youverify.yvos_sdk.components.ModalWindow
 import co.youverify.yvos_sdk.components.ProgressIndicator
 import co.youverify.yvos_sdk.exceptions.SdkException
 import co.youverify.yvos_sdk.theme.SdkTheme
+import co.youverify.yvos_sdk.util.FINISH_ACTIVITY
 import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
 import com.google.android.material.snackbar.Snackbar
@@ -90,7 +91,7 @@ internal class FormActivity : AppCompatActivity() {
     private fun initializeViews() {
 
         //closeButton=findViewById(R.id.form_close_button)
-        val appearance= VFormModule.formActivityObserver.option.appearance
+        val customization= VFormModule.formActivityObserver.vFormModule.customization
         progressIndicatorView=findViewById(R.id.progressIndicatorView)
         modalWindowView=findViewById(R.id.modalWindowView)
         webView=findViewById(R.id.webView_Vform)
@@ -98,7 +99,7 @@ internal class FormActivity : AppCompatActivity() {
         userName= intent.getStringExtra(USER_NAME)
 
         progressIndicatorView.setContent {
-            ProgressIndicator(colorString =appearance.primaryColor , visible =progressIndicatorVisible.value )
+            ProgressIndicator(colorString =customization.primaryColor , visible =progressIndicatorVisible.value )
         }
 
         modalWindowView.setContent {
@@ -113,10 +114,10 @@ internal class FormActivity : AppCompatActivity() {
                         webView.visibility=View.VISIBLE
                     },
                     visible = modalWindowVisible.value,
-                    buttonBackGroundColorString = appearance.buttonBackgroundColor,
-                    buttonTextColorString = appearance.buttonTextColor,
-                    buttonText = appearance.actionText,
-                    greeting = appearance.greeting
+                    buttonBackGroundColorString = customization.buttonBackgroundColor,
+                    buttonTextColorString = customization.buttonTextColor,
+                    buttonText = customization.actionText,
+                    greeting = customization.greeting
                 )
             }
 
@@ -322,6 +323,11 @@ internal class FormActivity : AppCompatActivity() {
         url?.let{
 
             if (cameraPermissionGranted) webView.loadUrl(url!!)
+        }
+
+        val finishActivity = intent?.getBooleanArrayExtra(FINISH_ACTIVITY)
+        finishActivity?.let {
+            if (it.first()) finish()
         }
     }
 }

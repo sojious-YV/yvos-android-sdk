@@ -4,7 +4,7 @@ internal data class AccessPointRequest(
     val businessId: String,
     val metadata: Map<String, Any> = emptyMap(),
     val details: UserDetail?,
-    val mode: String="sdk",
+    val mode: String ="sdk",
     val templateId: String
 )
 
@@ -21,7 +21,7 @@ data class UserDetail(
 internal data class AccessPointResponse(
     val data: AccessPointData,
     val links: List<Any>,
-    val details: Map<String,String> = emptyMap(),
+    val details: Map<String, String> = emptyMap(),
     val message: String,
     val statusCode: Int,
     val success: Boolean
@@ -41,7 +41,7 @@ internal data class AccessPointData(
 
 internal data class LivenessRequest(
     val publicMerchantID: String,
-    val faceImage: String="",
+    val faceImage: String ="",
     val passed: Boolean,
     val metadata: Map<String, Any> = emptyMap()
 ){
@@ -78,7 +78,7 @@ data class DocumentRequest(
     val publicMerchantID: String,
     val components: List<String> = listOf("id_capture"),
     val documentType: String,
-    val method: String="documentCapture",
+    val method: String ="documentCapture",
     val documentNumber: String,
     val metadata: Map<String, Any> = emptyMap()
 )

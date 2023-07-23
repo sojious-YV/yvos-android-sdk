@@ -7,7 +7,7 @@ internal class TokenInterceptor: Interceptor {
 
 
 
-    private val token:String="0HGwwgWy.e4tuJmKuiyrT89ipubc8LO6qKCazxbPjc0cA"
+    private val token: String ="0HGwwgWy.e4tuJmKuiyrT89ipubc8LO6qKCazxbPjc0cA"
 
 
 

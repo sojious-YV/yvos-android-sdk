@@ -31,6 +31,7 @@ import co.youverify.yvos_sdk.components.LoadingDialog
 import co.youverify.yvos_sdk.exceptions.InvalidCredentialsException
 import co.youverify.yvos_sdk.exceptions.SdkException
 import co.youverify.yvos_sdk.theme.SdkTheme
+import co.youverify.yvos_sdk.util.FINISH_ACTIVITY
 import co.youverify.yvos_sdk.util.NetworkResult
 import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
@@ -51,14 +52,14 @@ internal class LivenessCheckActivity : AppCompatActivity() {
     private lateinit var progressIndicatorView: ComposeView
     private var userName: String?=null
     private var pageReady = false
-    private  var url: String?=null
+    private  var url:String?=null
     private lateinit var webView: WebView
     private val TAG="FormActivity"
     private val modalWindowVisible = mutableStateOf(false)
-    private val cameraPermissionRequestLauncher: ActivityResultLauncher<String> = createCameraPermissionRequestLauncher()
+    private val cameraPermissionRequestLauncher: ActivityResultLauncher<kotlin.String> = createCameraPermissionRequestLauncher()
     lateinit var onClose:()->Unit
     lateinit var onFailure:()->Unit
-    lateinit var onSuccess:(LivenessData)->Unit
+    lateinit var onSuccess:(String)->Unit
     lateinit var onRetry:()->Unit
     lateinit var onCancel:()->Unit
 
@@ -95,13 +96,13 @@ internal class LivenessCheckActivity : AppCompatActivity() {
         loadingDialogView=findViewById(R.id.loadingDialogView)
         progressIndicatorView=findViewById(R.id.progressIndicatorView)
 
-        val appearance=LivenessCheckModule.livenessActivityObserver.option.appearance
+        val customization=LivenessCheckModule.livenessActivityObserver.livenessCheckModule.customization
 
 
         userName= intent.getStringExtra(USER_NAME)
 
         progressIndicatorView.setContent {
-            ProgressIndicator(colorString =appearance.primaryColor , visible =progressIndicatorVisible.value )
+            ProgressIndicator(colorString =customization.primaryColor , visible =progressIndicatorVisible.value )
         }
 
         modalWindowView.setContent {
@@ -114,10 +115,10 @@ internal class LivenessCheckActivity : AppCompatActivity() {
                         webView.visibility=View.VISIBLE
                     },
                     visible = modalWindowVisible.value,
-                    buttonBackGroundColorString = appearance.buttonBackgroundColor,
-                    buttonTextColorString = appearance.buttonTextColor,
-                    buttonText = appearance.actionText,
-                    greeting = appearance.greeting
+                    buttonBackGroundColorString = customization.buttonBackgroundColor,
+                    buttonTextColorString = customization.buttonTextColor,
+                    buttonText = customization.actionText,
+                    greeting = customization.greeting
                 )
             }
 
@@ -171,7 +172,7 @@ internal class LivenessCheckActivity : AppCompatActivity() {
             //Set up the Webview client
             webViewClient= object : WebViewClient() {
 
-                override fun onPageFinished(view: WebView?, url: String?) {
+                override fun onPageFinished(view: WebView?, url: kotlin.String?) {
 
                     if (view?.progress==100){
 
@@ -224,9 +225,14 @@ internal class LivenessCheckActivity : AppCompatActivity() {
             }
         }
 
+        val finishActivity = intent?.getBooleanArrayExtra(FINISH_ACTIVITY)
+        finishActivity?.let {
+            if (it.first()) finish()
+        }
+
     }
 
-    fun onLivenessDataReceived(data: String) {
+    fun onLivenessDataReceived(data: kotlin.String) {
 
         //If the browser event received does not contain Liveness Data
         if (data.contains("origin")){
@@ -280,19 +286,19 @@ internal class LivenessCheckActivity : AppCompatActivity() {
 
         dialogVisible.value=true
 
-        val option=LivenessCheckModule.livenessActivityObserver.option
+        val module=LivenessCheckModule.livenessActivityObserver.livenessCheckModule
 
         val request = LivenessRequest(
-            publicMerchantID =option.publicMerchantKey ,
+            publicMerchantID =module.publicMerchantKey ,
             faceImage = data?.photo!!,
             passed = data.passed,
-            metadata = option.metadata
+            metadata = module.metaData
         )
 
         val response:NetworkResult<LivenessResponse>
 
         try {
-            response=handleApi { SdkServiceFactory.sdkService(option).postLivenessData( livenessRequest = request) }
+            response=handleApi { SdkServiceFactory.sdkService(module).postLivenessData( livenessRequest = request) }
             handleResponse(response,data)
         }catch (e:IOException){
             dialogVisible.value=false
@@ -314,7 +320,7 @@ internal class LivenessCheckActivity : AppCompatActivity() {
             Toast.makeText(this,"Process  completed successfully",Toast.LENGTH_LONG).show()
             Log.d(TAG,"Liveness data posted successfully")
             Log.d(TAG, response.data.toString())
-            onSuccess(data)
+            onSuccess(data.photo!!)
 
 
             //finish()
@@ -335,7 +341,7 @@ internal class LivenessCheckActivity : AppCompatActivity() {
 
     }
 
-    private fun createCameraPermissionRequestLauncher(): ActivityResultLauncher<String> =
+    private fun createCameraPermissionRequestLauncher(): ActivityResultLauncher<kotlin.String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {granted->
 
             if (granted){

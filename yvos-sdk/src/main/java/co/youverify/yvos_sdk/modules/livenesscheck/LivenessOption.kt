@@ -1,8 +1,5 @@
 package co.youverify.yvos_sdk.modules.livenesscheck
 
-import co.youverify.yvos_sdk.Appearance
-import co.youverify.yvos_sdk.Option
-
 /**
  * Specifies both required and optional information needed to start the liveness check.
  * @property dev specifies whether the client is in development environment, defaults to false.
@@ -17,7 +14,7 @@ import co.youverify.yvos_sdk.Option
  * @property onRetry callback to notify when the liveness check is being retried after having previously failed. it is triggered when the "retry" button is clicked .
  * @constructor creates a LivenessOption with the specified properties.
  */
-class LivenessOption(
+/*class LivenessOption(
     publicMerchantKey:String,
     dev: Boolean=false,
     val sandBoxEnvironment:Boolean=false,
@@ -44,7 +41,7 @@ class LivenessOption(
  * @property lastName user's last name.
  * @constructor creates a LivenessPersonalInfo instance which holds the user's first name and last name.
  */
-data class LivenessPersonalInfo(val firstName:String="",val lastName:String="")
+data class LivenessPersonalInfo(val firstName:String="",val lastName:String="")*/
 
 
 

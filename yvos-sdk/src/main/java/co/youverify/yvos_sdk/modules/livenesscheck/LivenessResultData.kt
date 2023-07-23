@@ -10,12 +10,12 @@ internal data class LivenessResultData(
  * @property passed indicates the status of the liveness check.
  * @property photo the base64 encoded String of the snapshot taken during the liveness check.
  */
-data class LivenessData(
+internal data class LivenessData(
     val passed: Boolean,
-    val photo: String?
+    val photo: kotlin.String?
 )
 
-internal enum class LivenessResultType(val id: String) {
+internal enum class LivenessResultType(val id: kotlin.String) {
     SUCCESS("yvos:liveness:success"),
     FAILED("yvos:liveness:failed"),
     CANCELLED("yvos:liveness:cancelled"),

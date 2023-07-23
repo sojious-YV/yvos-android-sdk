@@ -31,6 +31,7 @@ import co.youverify.yvos_sdk.components.LoadingDialog
 import co.youverify.yvos_sdk.exceptions.InvalidCredentialsException
 import co.youverify.yvos_sdk.exceptions.SdkException
 import co.youverify.yvos_sdk.theme.SdkTheme
+import co.youverify.yvos_sdk.util.FINISH_ACTIVITY
 import co.youverify.yvos_sdk.util.NetworkResult
 import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
@@ -102,11 +103,11 @@ internal class DocumentCaptureActivity : AppCompatActivity() {
 
         userName= intent.getStringExtra(USER_NAME)
 
-        val appearance= DocumentCaptureModule.documentActivityObserver.option.appearance
+        val customization= DocumentCaptureModule.documentActivityObserver.documentCaptureModule.customization
 
 
         progressIndicatorView.setContent {
-            ProgressIndicator(colorString =appearance.primaryColor , visible =progressIndicatorVisible.value )
+            ProgressIndicator(colorString =customization.primaryColor , visible =progressIndicatorVisible.value )
         }
         loadingDialogView.setContent {
             LoadingDialog(visible = dialogVisible.value)
@@ -122,10 +123,10 @@ internal class DocumentCaptureActivity : AppCompatActivity() {
                         webView.visibility=View.VISIBLE
                     },
                     visible = modalWindowVisible.value,
-                    buttonBackGroundColorString = appearance.buttonBackgroundColor,
-                    buttonTextColorString = appearance.buttonTextColor,
-                    buttonText = appearance.actionText,
-                    greeting = appearance.greeting
+                    buttonBackGroundColorString = customization.buttonBackgroundColor,
+                    buttonTextColorString = customization.buttonTextColor,
+                    buttonText = customization.actionText,
+                    greeting = customization.greeting
                 )
             }
 
@@ -228,6 +229,11 @@ internal class DocumentCaptureActivity : AppCompatActivity() {
                 webView.loadUrl(it)
             }
         }
+
+        val finishActivity = intent?.getBooleanArrayExtra(FINISH_ACTIVITY)
+        finishActivity?.let {
+            if (it.first()) finish()
+        }
     }
 
     fun onDocumentDataReceived(data: String) {
@@ -263,10 +269,10 @@ internal class DocumentCaptureActivity : AppCompatActivity() {
     private fun postScannedData(data: DocumentData) {
 
         dialogVisible.value=true
-        val option=DocumentCaptureModule.documentActivityObserver.option
+        val module=DocumentCaptureModule.documentActivityObserver.documentCaptureModule
         val request = DocumentRequest(
-            publicMerchantID = option.publicMerchantKey,
-            documentNumber = data?.documentNumber?:"",
+            publicMerchantID = module.publicMerchantKey,
+            documentNumber = data.documentNumber,
             documentType = "id_card"
         )
 
@@ -274,7 +280,7 @@ internal class DocumentCaptureActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                response= handleApi { SdkServiceFactory.sdkService(option).postDocumentData(request) }
+                response= handleApi { SdkServiceFactory.sdkService(module).postDocumentData(request) }
                 handleResponse(response,data)
             }catch (e: IOException){
                 //progressBar.visibility= View.INVISIBLE

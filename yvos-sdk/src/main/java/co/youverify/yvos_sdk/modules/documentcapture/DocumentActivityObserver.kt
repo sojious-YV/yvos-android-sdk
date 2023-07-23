@@ -7,11 +7,11 @@ import co.youverify.yvos_sdk.modules.livenesscheck.LivenessCheckActivity
 internal class DocumentActivityObserver(val documentCaptureModule: DocumentCaptureModule) :DefaultLifecycleObserver {
 
     private lateinit var documentActivity: DocumentCaptureActivity
-    lateinit var option: DocumentOption
+    //lateinit var option: DocumentOption
     var onSuccessCallback:(DocumentData)->Unit={}
      var onCloseCallback:()->Unit={}
     var onCancelCallback:()->Unit={}
-    private var onResumeCalled=false
+    //private var onResumeCalled=false
 
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -20,9 +20,9 @@ internal class DocumentActivityObserver(val documentCaptureModule: DocumentCaptu
 
     override fun onStart(owner: LifecycleOwner) {
 
-        onSuccessCallback=option.onSuccess
-        onCloseCallback=option.onClose
-        onCancelCallback=option.onCancel
+        onSuccessCallback=documentCaptureModule.onSuccess
+        onCloseCallback=documentCaptureModule.onClose
+        onCancelCallback=documentCaptureModule.onCancel
 
         documentActivity.apply {
             onSuccess=onSuccessCallback

@@ -1,7 +1,5 @@
 package co.youverify.yvos_sdk.modules.documentcapture
 
-import co.youverify.yvos_sdk.Appearance
-import co.youverify.yvos_sdk.Option
 /**
  * Specifies both required and optional information needed to start the liveness check.
  * @property dev specifies whether the client is in development environment, defaults to false.
@@ -17,14 +15,14 @@ import co.youverify.yvos_sdk.Option
  * @property countries the list of countries which will be available for users to select from.
  * @constructor creates a DocumentOption with the specified properties.
  */
- class DocumentOption(
+ /*class DocumentOption(
 
     publicMerchantKey:String,
     dev: Boolean=false,
     val sandBoxEnvironment:Boolean=false,
     metadata: Map<String, Any> = emptyMap(),
     val personalInfo:DocumentPersonalInfo?=null,
-    val appearance: Appearance = Appearance(
+    //val appearance: Appearance = Appearance(
        greeting = "We will need to carry out a  document capture. It will only take a moment.",
        actionText = "Start Document Capture",
        buttonBackgroundColor = "#46B2C8",
@@ -36,7 +34,7 @@ import co.youverify.yvos_sdk.Option
     val onCancel: () -> Unit,
     val onClose: () -> Unit,
 
-    ): Option(publicMerchantKey,dev,metadata)
+    ): Option(publicMerchantKey,dev,metadata)*/
 
 /**
  * Holds information about the country to be used for document capture.
@@ -45,11 +43,11 @@ import co.youverify.yvos_sdk.Option
  * @property idTypes a list of supported id types in the country.
  * @property province a list of provinces in the country.
  */
- data class Country(
+ /*data class Country(
     val countryCode: String="",
     val idTypes: List<String> = emptyList(),
     val province: List<String> = emptyList()
-)
+)*/
 
 /**
  * This class holds user information for the document capture service.
@@ -57,7 +55,7 @@ import co.youverify.yvos_sdk.Option
  * the document capture process begins.
  * @constructor creates a DocumentPersonalInfo instance which holds the user's first name.
  */
-data class DocumentPersonalInfo (val firstName:String="")
+/*data class DocumentPersonalInfo (val firstName:String="")
 
 
 internal enum class DocumentType(val documentName: String) {
@@ -94,6 +92,6 @@ internal enum class DocumentType(val documentName: String) {
    SOCIAL_SECURITY_CARD("social_security_card"),
    GREEN_CARD("green_card"),
    NEXUS_CARD("nexus_card")
-}
+}*/
 
 

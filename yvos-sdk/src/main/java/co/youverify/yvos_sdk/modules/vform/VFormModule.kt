@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import co.youverify.yvos_sdk.Customization
+import co.youverify.yvos_sdk.SdkModule
+import co.youverify.yvos_sdk.UserInfo
 import co.youverify.yvos_sdk.data.AccessPointRequest
 import co.youverify.yvos_sdk.data.AccessPointResponse
 import co.youverify.yvos_sdk.data.SdkServiceFactory
@@ -11,9 +14,9 @@ import co.youverify.yvos_sdk.data.UserDetail
 import co.youverify.yvos_sdk.util.DEVELOPMENT_BASE_URL
 import co.youverify.yvos_sdk.util.PRODUCTION_BASE_URL
 import co.youverify.yvos_sdk.util.ID_LENGTH
-import co.youverify.yvos_sdk.exceptions.InvalidArgumentException
 import co.youverify.yvos_sdk.exceptions.InvalidCredentialsException
 import co.youverify.yvos_sdk.exceptions.SdkException
+import co.youverify.yvos_sdk.util.FINISH_ACTIVITY
 import co.youverify.yvos_sdk.util.NetworkResult
 import co.youverify.yvos_sdk.util.URL_TO_DISPLAY
 import co.youverify.yvos_sdk.util.USER_NAME
@@ -22,17 +25,110 @@ import co.youverify.yvos_sdk.util.validatePublicMerchantKeyAndAppearance
 
 /**
  * This class enables access to the Vform service.
- * @property option holds the appearance specifications and the information needed to display the appropriate form.
- * @constructor creates an instant of this module whose configuration is specified by the "option" property.
+ * @param builder object used to define both mandatory and optional parameters.
+ * @constructor creates an instant of [VFormModule] using the passed in builder.
  */
-class VFormModule  constructor(private val option: VFormOption) {
+class VFormModule private constructor(builder: Builder): SdkModule(
+    builder.publicMerchantKey,
+    builder.dev,builder.customization,
+    builder.userInfo,
+    builder.metaData,
+) {
 
 
     private lateinit var mContext: Context
+    var vFormId: String
+        private set
+    var onSuccess: (String) -> Unit
+        private set
+    var onFailed: () -> Unit
+        private set
+    var onCompleted: (String) -> Unit
+        private set
+    var mMetaData: Map<String,Any>
+        private set
+    var sandBoxEnvironment = false
+    private set
+
+    init {
+        this.vFormId = builder.vFormId
+        this.onSuccess = builder.onSuccess
+        this.onFailed = builder.onFailed
+        this.onCompleted = builder.onCompleted
+        this.mMetaData = builder.metaData
+    }
+
+
 
     companion object{
          internal lateinit var formActivityObserver: FormActivityObserver
+
      }
+
+
+    class Builder(publicMerchantKey:String,formId:String){
+        //private lateinit var mContext: Context
+        var vFormId: String
+        var publicMerchantKey: String
+        var dev:Boolean = false
+        var customization:Customization = Customization.Builder().build()
+        private set
+        var userInfo:UserInfo? = null
+        var onSuccess: (String) -> Unit = {}
+        private set
+        var onFailed: () -> Unit={}
+        private set
+        var onCompleted: (String) -> Unit={}
+        private set
+        var metaData: Map<String,Any> = emptyMap()
+
+
+        init {
+            this.vFormId=formId
+            this.publicMerchantKey = publicMerchantKey
+        }
+        fun dev(dev:Boolean): Builder {
+            this.dev = dev
+            return this
+        }
+        fun onSuccess (onSuccess:(String) -> Unit): Builder {
+            this.onSuccess = onSuccess
+            return this
+
+        }
+
+        fun onFailed(onFailed:() -> Unit): Builder {
+            this.onFailed = onFailed
+            return this
+
+        }
+
+        fun onCompleted(onCompleted:(String) -> Unit): Builder {
+            this.onCompleted = onCompleted
+            return this
+
+        }
+
+        fun customization(customization:Customization): Builder {
+            this.customization = customization
+            return this
+        }
+
+        fun userInfo(userInfo: UserInfo?): Builder {
+            this.userInfo = userInfo
+            return this
+
+        }
+
+        fun metaData(metaData: Map<String,Any>): Builder {
+            this.metaData = metaData
+            return this
+        }
+
+        fun build(): VFormModule {
+            return VFormModule(this)
+        }
+    }
 
     /**
      * Starts the vForm service by attempting to display the form that corresponds to the "formId" supplied in the "option" property.
@@ -46,41 +142,41 @@ class VFormModule  constructor(private val option: VFormOption) {
 
         //initialize Activity observer
         formActivityObserver=FormActivityObserver(this)
-        formActivityObserver.option=option
+
         mContext=context
 
 
         context.startActivity(
             Intent(context, FormActivity::class.java).apply {
-                putExtra(USER_NAME,option.personalInfo?.firstName)
+                putExtra(USER_NAME, userInfo?.firstName)
             }
         )
 
         //validate formId length, MerchantKey length and personal info fields
-        validateOption()
+        validateProperties()
     }
 
 
-    suspend fun sendFormUrl() {
+   internal suspend fun sendFormUrl() {
 
 
-        val personalInfo=option.personalInfo
+        val personalInfo=userInfo
         val request = AccessPointRequest(
-            templateId = option.vFormId,
-            businessId = option.publicMerchantKey,
-            metadata = option.metadata,
-            details = if (personalInfo!=null) UserDetail(
-                firstName = personalInfo.firstName,
-                lastName = personalInfo.lastName,
-                middleName = personalInfo.middleName,
-                email = personalInfo.email,
-                mobile = personalInfo.mobile,
-                gender = personalInfo.gender.name
+            templateId = vFormId,
+            businessId = publicMerchantKey,
+            metadata = mMetaData,
+            details = if (userInfo!=null) UserDetail(
+                firstName = userInfo?.firstName,
+                lastName = personalInfo?.lastName,
+                middleName = personalInfo?.middleName,
+                email = personalInfo?.email,
+                mobile = personalInfo?.mobile,
+                gender = personalInfo?.gender?.name
             ) else null
         )
 
         // Get the form accessId
-        val response= handleApi { SdkServiceFactory.sdkService(option).getAccessPoint( accessPointRequest = request) }
+        val response= handleApi { SdkServiceFactory.sdkService(this).getAccessPoint( accessPointRequest = request) }
         handleResponse(response,mContext)
 
 
@@ -92,9 +188,9 @@ class VFormModule  constructor(private val option: VFormOption) {
             //sendFormUrl(response.data.data.id,context)
             val accessId=response.data.data.id
             Log.d("FormActivity",accessId)
-            val baseUrl=if (option.dev) DEVELOPMENT_BASE_URL else PRODUCTION_BASE_URL
-            val formUrl=if(option.sandBoxEnvironment) "${baseUrl}/v-forms/${option.vFormId}?accessId=${accessId}&e=s"
-            else "${baseUrl}/v-forms/${option.vFormId}?accessId=${accessId}"
+            val baseUrl=if (dev) DEVELOPMENT_BASE_URL else PRODUCTION_BASE_URL
+            val formUrl=if(sandBoxEnvironment) "${baseUrl}/v-forms/${vFormId}?accessId=${accessId}&e=s"
+            else "${baseUrl}/v-forms/${vFormId}?accessId=${accessId}"
 
 
             context.startActivity(
@@ -119,29 +215,36 @@ class VFormModule  constructor(private val option: VFormOption) {
 
     }
 
-    private fun validateOption() {
+    private fun validateProperties() {
 
-        val personalInfo=option.personalInfo
+        //val personalInfo=userInfo
 
         validatePublicMerchantKeyAndAppearance(
-            publicMerchantKey = option.publicMerchantKey,
-            appearance = option.appearance
+            publicMerchantKey = publicMerchantKey,
+            appearance = customization
         )
 
-        if (option.vFormId.length!= ID_LENGTH || option.vFormId.isEmpty())
-            throw InvalidCredentialsException("vFormId cannot be empty and must be 24 characters long")
+        if (vFormId.length!= ID_LENGTH || vFormId.isEmpty())
+            throw IllegalArgumentException("vFormId cannot be empty and must be 24 characters long")
 
 
-        if (personalInfo!=null){
+        if (userInfo!=null){
             if(
-                personalInfo.firstName?.isEmpty()==true || personalInfo.lastName?.isEmpty()==true ||
-                personalInfo.middleName?.isEmpty()==true || personalInfo.email?.isEmpty()==true ||
-                personalInfo.mobile?.isEmpty()==true
+                userInfo?.firstName?.isEmpty()==true || userInfo?.lastName?.isEmpty()==true ||
+                userInfo?.middleName?.isEmpty()==true || userInfo?.email?.isEmpty()==true ||
+                userInfo?.mobile?.isEmpty()==true
             )
-                throw InvalidArgumentException("Personal Information fields cannot be empty")
+                throw IllegalArgumentException("Personal Information fields cannot be empty")
         }
-        
 
+    }
+
+    fun close(){
+        mContext.startActivity(
+            Intent(mContext, FormActivity::class.java).apply {
+                putExtra(FINISH_ACTIVITY,true)
+            }
+        )
 
     }
 

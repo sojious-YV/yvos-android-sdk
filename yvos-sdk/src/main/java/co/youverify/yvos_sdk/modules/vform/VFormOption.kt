@@ -1,8 +1,5 @@
 package co.youverify.yvos_sdk.modules.vform
 
-import co.youverify.yvos_sdk.Appearance
-import co.youverify.yvos_sdk.Option
-
 /**
  * Specifies both required and optional information needed to display the appropriate form.
  * @property dev specifies whether the client is in development environment, defaults to false.
@@ -19,7 +16,7 @@ import co.youverify.yvos_sdk.Option
  * @property onCompleted callback to notify when the form submission process completes succesfully. The notable difference from [onSuccess] is that is is triggered immediately after it.
  * @constructor creates a VFormOption with the specified properties.
  */
-class VFormOption(
+/*class VFormOption(
     val vFormId: String,
     publicMerchantKey: String,
     val personalInfo:VFormPersonalInfo?=null,
@@ -70,4 +67,4 @@ data class VFormPersonalInfo(
     MALE,
     FEMALE,
     NOT_IDENTIFIED
-}
+}*/

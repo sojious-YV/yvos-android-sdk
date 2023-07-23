@@ -6,19 +6,13 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import co.youverify.yvos_sdk.Appearance
-import co.youverify.yvos_sdk.YouverifySdk
+import co.youverify.yvos_sdk.Customization
+import co.youverify.yvos_sdk.UserInfo
+import co.youverify.yvos_sdk.modules.documentcapture.DocumentCaptureModule
 import co.youverify.yvos_sdk.modules.documentcapture.DocumentData
-import co.youverify.yvos_sdk.modules.documentcapture.DocumentOption
-import co.youverify.yvos_sdk.modules.documentcapture.DocumentPersonalInfo
-import co.youverify.yvos_sdk.modules.livenesscheck.LivenessData
-import co.youverify.yvos_sdk.modules.livenesscheck.LivenessOption
-import co.youverify.yvos_sdk.modules.livenesscheck.LivenessPersonalInfo
-import co.youverify.yvos_sdk.modules.vform.VFormOption
-import co.youverify.yvos_sdk.modules.vform.VFormPersonalInfo
+import co.youverify.yvos_sdk.modules.livenesscheck.LivenessCheckModule
+import co.youverify.yvos_sdk.modules.vform.VFormModule
 import com.google.gson.Gson
-import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -31,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var showDataButton: Button
     private var mFormData: String?=null
     private var mDocumentData: DocumentData?=null
-    private var mLivenessData: LivenessData?=null
+    private var livenessPhoto: String?=null
     lateinit var progressBar:ProgressBar
     lateinit var formButton: Button
     lateinit var livenessButton: Button
@@ -93,8 +87,12 @@ class MainActivity : AppCompatActivity() {
 
 
         if (livenessClicked){
-            MainViewmodel.livenessData=mLivenessData
-            startActivity(Intent(this,LivenessDataActivity::class.java))
+            //MainViewmodel.livenessData=livenessPhoto
+            startActivity(
+                Intent(this,LivenessDataActivity::class.java).apply {
+                    putExtra(RETURNED_DATA_STRING,livenessPhoto)
+                }
+            )
             return
         }
 
@@ -120,7 +118,13 @@ class MainActivity : AppCompatActivity() {
         val buttonTextColor=inputData.buttonTextColor.ifEmpty { "#ffffff" }
         val primaryColor=inputData.primaryColor.ifEmpty { "#46B2C8" }
 
-        val vFormOption= VFormOption(
+        val userInfo = if (inputData.firstName.isNotEmpty() && inputData.lastName.isEmpty())
+            UserInfo.Builder().firstName(inputData.firstName).build()
+            else if (inputData.firstName.isNotEmpty() && inputData.lastName.isNotEmpty())
+                UserInfo.Builder().firstName(inputData.firstName).lastName(inputData.lastName).build()
+            else null
+
+       /* val vFormOption= VFormOption(
             vFormId = inputData.formId.ifEmpty { "64a6c1501d9315437ae409be" },
             publicMerchantKey = inputData.businessId.ifEmpty { "61d880f1e8e15aaf24558f1a" },
             //publicMerchantKey = "62b2e8b281442b03187f7896",
@@ -152,36 +156,68 @@ class MainActivity : AppCompatActivity() {
             }else{
                 null
             },
-            appearance = Appearance(
+            appearance = Customization(
             greeting = greeting,
             actionText = actionText,
             buttonBackgroundColor = buttonBackgroundColor,
             buttonTextColor = buttonTextColor,
             primaryColor = primaryColor
             )
-        )
+        )*/
 
 
-        val vFormModule=YouverifySdk.vFormModule(option = vFormOption)
+        //val vFormModule=YouverifySdk.vFormModule(option = vFormOption)
+        if (mFormData!=null) mFormData = null
 
-        lifecycleScope.launch {
-            vFormModule.start(this@MainActivity)
-        }
+        val vFormModule = VFormModule.Builder(publicMerchantKey = inputData.businessId.ifEmpty { "61d880f1e8e15aaf24558f1a" }, formId = inputData.formId.ifEmpty { "64a6c1501d9315437ae409be" } )
+            .dev(true)
+            .userInfo(
+                userInfo
+            )
+            .customization(
+                Customization.Builder()
+                    .primaryColor(primaryColor)
+                    .greetingMessage(greeting)
+                    .actionButtonText(actionText)
+                    .actionButtonTextColor(buttonTextColor)
+                    .actionButtonBackgroundColor(buttonBackgroundColor)
+                    .build()
+            )
+            .onSuccess { formData ->
+                //form was submitted successfully. perform some action here
+            }
+            .onFailed {
+                //form submission failed due to some error. perform some action here
+            }
+            .onCompleted {formData ->
+                //form was submitted successfully. This is called immediately after "0nSuccess()".
+                // perform some action here
+            }
+            .metaData(emptyMap())
+            .build()
+
+
+
+        vFormModule.start(this@MainActivity)
+
     }
 
 
 
     private fun useLivenessModule(){
 
-        if (MainViewmodel.livenessData!=null) MainViewmodel.livenessData=null
+        if (livenessPhoto!=null) livenessPhoto = null
 
         val greeting=inputData.greeting.ifEmpty { "We will need to carry out a liveness check. It will only take a moment." }
         val actionText=inputData.actionText.ifEmpty { "Start Liveness Test" }
         val buttonBackgroundColor=inputData.buttonBackGroundColor.ifEmpty { "#46B2C8" }
         val buttonTextColor=inputData.buttonTextColor.ifEmpty { "#ffffff" }
         val primaryColor=inputData.primaryColor.ifEmpty { "#46B2C8" }
+        val userInfo = if (inputData.firstName.isNotEmpty())
+            UserInfo.Builder().firstName(inputData.firstName).build()
+        else null
 
-        val livenessOption= LivenessOption(
+        /*val livenessOption= LivenessOption(
             publicMerchantKey = inputData.businessId.ifEmpty { "61d880f1e8e15aaf24558f1a" },
             //publicMerchantKey = "6222a5ed3e7a41c29c031ecc",
             dev = true,
@@ -195,17 +231,50 @@ class MainActivity : AppCompatActivity() {
             }else{null},
 
             //Green, White, Blue
-            appearance = Appearance(
+            appearance = Customization(
                 greeting = greeting,
                 actionText = actionText,
                 buttonBackgroundColor = buttonBackgroundColor,
                 buttonTextColor = buttonTextColor,
                 primaryColor = primaryColor
             )
-        )
+        )*/
 
-        val livenessModule=YouverifySdk.livenessModule(livenessOption)
-        livenessModule.start(this)
+        //val livenessModule=YouverifySdk.livenessModule(livenessOption)
+
+        val livenessCheckModule = LivenessCheckModule.Builder(publicMerchantKey = inputData.businessId.ifEmpty { "61d880f1e8e15aaf24558f1a" })
+            .dev(true)
+            .userInfo(
+                userInfo
+            )
+            .customization(
+                Customization.Builder()
+                    .primaryColor(primaryColor)
+                    .greetingMessage(greeting)
+                    .actionButtonText(actionText)
+                    .actionButtonTextColor(buttonTextColor)
+                    .actionButtonBackgroundColor(buttonBackgroundColor)
+                    .build()
+            )
+            .onSuccess { livenessPhoto ->
+                // perform some action here
+                this.livenessPhoto = livenessPhoto
+            }
+            .onFailed {
+                // perform some action here
+            }
+            .onRetry {
+                // perform some action here
+            }
+            .onCancel {
+                // perform some action here
+            }
+            .onClose {
+                // perform some action here
+            }
+            .build()
+
+        livenessCheckModule.start(this)
 
     }
 
@@ -219,9 +288,12 @@ class MainActivity : AppCompatActivity() {
         val buttonBackgroundColor=inputData.buttonBackGroundColor.ifEmpty { "#46B2C8" }
         val buttonTextColor=inputData.buttonTextColor.ifEmpty { "#ffffff" }
         val primaryColor=inputData.primaryColor.ifEmpty { "#46B2C8" }
+        val userInfo = if (inputData.firstName.isNotEmpty())
+            UserInfo.Builder().firstName(inputData.firstName).build()
+        else null
 
 
-        val documentOption= DocumentOption(
+        /*val documentOption= DocumentOption(
             publicMerchantKey = inputData.businessId.ifEmpty { "61d880f1e8e15aaf24558f1a" },
             //publicMerchantKey = "6222a5ed3e7a41c29c031ecc",
             //dev = true,
@@ -234,17 +306,48 @@ class MainActivity : AppCompatActivity() {
             personalInfo = if (inputData.firstName.isNotEmpty()){
                 DocumentPersonalInfo(firstName = inputData.firstName)
             }else{null},
-            appearance = Appearance(
+            appearance = Customization(
                 greeting = greeting,
                 actionText = actionText,
                 buttonBackgroundColor = buttonBackgroundColor,
                 buttonTextColor =buttonTextColor,
                 primaryColor = primaryColor
             )
-        )
+        )*/
 
-        val documentModule=YouverifySdk.documentCaptureModule(option = documentOption)
-        documentModule.start(this)
+        //val documentModule=YouverifySdk.documentCaptureModule(option = documentOption)
+        val documentCaptureModule = DocumentCaptureModule.Builder(publicMerchantKey = inputData.businessId.ifEmpty { "61d880f1e8e15aaf24558f1a" })
+            .dev(true)
+            .userInfo(
+                userInfo
+            )
+            .customization(
+                Customization.Builder()
+                    .primaryColor(primaryColor)
+                    .greetingMessage(greeting)
+                    .actionButtonText(actionText)
+                    .actionButtonTextColor(buttonTextColor)
+                    .actionButtonBackgroundColor(buttonBackgroundColor)
+                    .build()
+            )
+            .onSuccess {documentData ->
+                //perform some action
+            }
+            .onFailed{
+                //perform some action
+            }
+            .onRetry {
+                //perform some action
+            }
+            .onCancel{
+                //perform some action
+            }
+            .onClose{
+                //perform some action
+            }
+            .build()
+
+        documentCaptureModule.start(this)
 
     }
 }

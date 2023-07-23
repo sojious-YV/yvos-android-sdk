@@ -1,13 +1,12 @@
 package co.youverify.yvos_sdk.util
 
 
+
 import android.graphics.Color
-import co.youverify.yvos_sdk.Appearance
-import co.youverify.yvos_sdk.exceptions.InvalidArgumentException
-import co.youverify.yvos_sdk.exceptions.InvalidCredentialsException
+import co.youverify.yvos_sdk.Customization
 import retrofit2.Response
 import java.io.IOException
-import java.lang.IllegalArgumentException
+import kotlin.IllegalArgumentException
 
 
 internal suspend fun<T:Any> handleApi(callApi: suspend () -> Response<T>): NetworkResult<T> {
@@ -36,29 +35,32 @@ internal suspend fun<T:Any> handleApi(callApi: suspend () -> Response<T>): Netwo
 
 }
 
-fun validatePublicMerchantKeyAndAppearance(publicMerchantKey:String,appearance: Appearance){
+fun validatePublicMerchantKeyAndAppearance(publicMerchantKey:String,appearance: Customization){
 
     if (publicMerchantKey.length!= ID_LENGTH ||publicMerchantKey.isEmpty())
-        throw InvalidCredentialsException("public merchant key cannot be empty and must be 24 characters long")
+        throw IllegalArgumentException("public merchant key cannot be empty and must be 24 characters long")
 
     try{
         Color.parseColor(appearance.primaryColor)
     }catch (exception: IllegalArgumentException){
-        throw InvalidArgumentException("The primary color string is invalid, it should be a valid hex code such as: \"#ffffff\" ")
+        throw IllegalArgumentException("The primary color string is invalid, it should be a valid hex code such as: \"#ffffff\" ")
     }
 
     try{
         Color.parseColor(appearance.buttonTextColor)
     }catch (exception: IllegalArgumentException){
-        throw InvalidArgumentException("The button text color string is invalid, it should be a valid hex code such as: \"#ffffff\" ")
+        throw IllegalArgumentException("The button text color string is invalid, it should be a valid hex code such as: \"#ffffff\" ")
     }
 
     try{
         Color.parseColor(appearance.buttonBackgroundColor)
     }catch (exception: IllegalArgumentException){
-        throw InvalidArgumentException("The button background color string is invalid, it should be a valid hex code such as: \"#ffffff\" ")
+        throw IllegalArgumentException("The button background color string is invalid, it should be a valid hex code such as: \"#ffffff\" ")
     }
 }
+
+
+
 
 
 
