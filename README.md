@@ -267,7 +267,8 @@ You can create an instance of the LivenessCheckModule with Java by using the `Li
 
 You can create an instance of the LivenessCheckModule as the following example below:
 
-```java
+<pre>
+<code class="language-kotlin">javajava
  LivenessCheckModule livenessCheckModule = new LivenessCheckModule.Builder("61d880f1e8f1a")
                 .dev(true) // only set to true if you're in development mode. The default value is false.
                 .userInfo(
@@ -323,19 +324,20 @@ You can create an instance of the LivenessCheckModule as the following example b
                 })
                 .metaData(Collections.emptyMap()) // any other information you wish to pass to your Webhook Url
                 .build();
-```
+</pre>
+</code>
 
 #### Start the process
 
-```java
+<pre>java
 LivenessCheckModule.start(context);
-```
+</pre>
 
 #### Cancel the process
 
-```java
+<pre>java
 LivenessCheckModule.close();
-```
+</pre>
 
 </details>
 
