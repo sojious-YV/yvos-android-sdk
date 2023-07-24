@@ -1,11 +1,11 @@
-package co.youverify.yvos_sdk.modules.vform
+package co.youverify.yvos_sdk.modules.workflowBuilder
 
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
-internal class FormActivityObserver(val vFormModule: VFormModule):DefaultLifecycleObserver {
+internal class FormActivityObserver(val workflowBuilderModule: WorkflowBuilderModule):DefaultLifecycleObserver {
 
     //private var onResumeCalled=false
 
@@ -23,9 +23,9 @@ internal class FormActivityObserver(val vFormModule: VFormModule):DefaultLifecyc
 
     override fun onStart(owner: LifecycleOwner) {
 
-        onSuccessCallback=vFormModule.onSuccess
-        onFailedCallback=vFormModule.onFailed
-        onCompletedCallback=vFormModule.onCompleted
+        onSuccessCallback=workflowBuilderModule.onSuccess
+        onFailedCallback=workflowBuilderModule.onFailed
+        onCompletedCallback=workflowBuilderModule.onCompleted
 
 
         formActivity.apply {
@@ -47,6 +47,6 @@ internal class FormActivityObserver(val vFormModule: VFormModule):DefaultLifecyc
     }
 
     fun sendFormUrl(){
-        formActivity.lifecycleScope.launch { vFormModule.sendFormUrl() }
+        formActivity.lifecycleScope.launch { workflowBuilderModule.sendFormUrl() }
     }
 }

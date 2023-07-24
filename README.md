@@ -1,6 +1,6 @@
 # Youverify Android SDK
 
-The official SDK for Youverify OS. The SDK provides you with a seamless way to integrate Youverify services into your Android app. With the SDK your users can fill out created Vforms, perform a liveness check and a document capture while you're provided with the status and details of each process in-app.
+The official SDK for Youverify OS. The SDK provides you with a seamless way to integrate Youverify services into your Android app. With the SDK your users can fill out forms created with our Workflow builder, perform a liveness check and a document capture while you're provided with the status and details of each process in-app.
 
 The Android SDK supports both _Kotlin_ and _Java_, but we strongly recommend using _Kotlin_.
 
@@ -35,12 +35,12 @@ You can also provide optional parameters like:
 The customization options are used to customize the SDK's UI to align with your app's theme and also show a personalized message (using the user's first name) to the user before any of the processes starts while the user information is either used to automatically fill in some fields in the form or is stored alongside the result of a successful liveness check to our remote server.
 The SDK supports both Kotlin and Java projects, so you can reference it in your language.
 
-### Using the VForm Module with Kotlin
+### Using the WorkflowBuilder Module with Kotlin
 
-First off, create an instance of the VFormModule with the `VFormModule.Builder` class, passing in your merchant key and the template Id of the form to be displayed.
+First off, create an instance of the WorkflowBuilderModule with the `WorkflowBuilderModule.Builder` class, passing in your merchant key and the template Id of the form to be displayed.
 
 ```kotlin
-val vFormModule = VFormModule.Builder(publicMerchantKey = "61d880f1e8e18f1a", formId = "64a6c1501dae409be")
+val workflowBuilderModule = WorkflowBuilderModule.Builder(publicMerchantKey = "61d880f1e8e18f1a", formId = "64a6c1501dae409be")
             .onSuccess { formData ->
                 //form was submitted successfully. perform some action here.
                 //"formData" is a JSON String containing key-value pairs of the form fields and their values.
@@ -57,7 +57,7 @@ val vFormModule = VFormModule.Builder(publicMerchantKey = "61d880f1e8e18f1a", fo
 #### Specifying optional parameters:
 
 ```kotlin
-val vFormModule = VFormModule.Builder(publicMerchantKey = "61d880f1e8f1a", formId = "64a6c15e409be" )
+val workflowBuilderModule = WorkflowBuilderModule.Builder(publicMerchantKey = "61d880f1e8f1a", formId = "64a6c15e409be" )
             .dev(true) // only set to true if you're in development mode. The default value is false.
             .userInfo(
                 //specify user details to be automatically filled and omitted from the form
@@ -97,10 +97,10 @@ val vFormModule = VFormModule.Builder(publicMerchantKey = "61d880f1e8f1a", formI
 
 #### Display the form
 
-Call `start()` on the `VFormModule` instance passing in a `Context` object to show the form to your user:
+Call `start()` on the `WorkflowBuilderModule` instance passing in a `Context` object to show the form to your user:
 
 ```kotlin
- vFormModule.start(context)
+ workflowBuilderModule.start(context)
 ```
 
 #### Cancel the process
@@ -108,15 +108,15 @@ Call `start()` on the `VFormModule` instance passing in a `Context` object to sh
 The process is automatically canceled once either of the `onSuccess` or `onCompleted` callbacks returns, but you can also cancel manually by calling `close()`:
 
 ```kotlin
- vFormModule.close() // cancel the process
+ workflowBuilderModule.close() // cancel the process
 ```
 
-### Use VFormModule with Java
+### Use WorkflowBuilderModule with Java
 
-You can create an instance of the VFormModule with Java by using the `VFormModule.Builder` class, as the following example below:
+You can create an instance of the WorkflowBuilderModule with Java by using the `WorkflowBuilderModule.Builder` class, as the following example below:
 
 ```java
- VFormModule vFormModule = new VFormModule.Builder("61d880f1e8f1a", "64a6c15e409be")
+ WorkflowBuilderModule workflowBuilderModule = new WorkflowBuilderModule.Builder("61d880f1e8f1a", "64a6c15e409be")
                 .dev(true) // only set to true if you're in development mode. The default value is false.
                 .userInfo(
                         //specify user details to be automatically filled and omitted from the form
@@ -165,16 +165,16 @@ You can create an instance of the VFormModule with Java by using the `VFormModul
 #### Display the Form
 
 ```java
-vFormModule.start(context);
+workflowBuilderModule.start(context);
 ```
 
 #### Cancel the process
 
 ```java
-vFormModule.close();
+workflowBuilderModule.close();
 ```
 
-### Using the Liveness Check Module with Kotlin
+### Using the LivenessCheck Module with Kotlin
 
 First off, create an instance of the LivenessCheckModule with the `LivenessCheckModule.Builder` class, passing in your merchant key.
 
@@ -323,7 +323,7 @@ LivenessCheckModule.start(context);
 LivenessCheckModule.close();
 ```
 
-### Using the Document Capture Module with Kotlin
+### Using the DocumentCapture Module with Kotlin
 
 First off, create an instance of the DocumentCaptureModule with the `DocumentCaptureModule.Builder` class, passing in your merchant key.
 

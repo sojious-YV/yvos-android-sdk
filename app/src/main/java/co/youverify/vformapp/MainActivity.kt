@@ -11,7 +11,7 @@ import co.youverify.yvos_sdk.UserInfo
 import co.youverify.yvos_sdk.modules.documentcapture.DocumentCaptureModule
 import co.youverify.yvos_sdk.modules.documentcapture.DocumentData
 import co.youverify.yvos_sdk.modules.livenesscheck.LivenessCheckModule
-import co.youverify.yvos_sdk.modules.vform.VFormModule
+import co.youverify.yvos_sdk.modules.workflowBuilder.WorkflowBuilderModule
 import com.google.gson.Gson
 
 
@@ -169,7 +169,7 @@ class MainActivity : AppCompatActivity() {
         //val vFormModule=YouverifySdk.vFormModule(option = vFormOption)
         if (mFormData!=null) mFormData = null
 
-        val vFormModule = VFormModule.Builder(publicMerchantKey = inputData.businessId.ifEmpty { "61d880f1e8e15aaf24558f1a" }, formId = inputData.formId.ifEmpty { "64a6c1501d9315437ae409be" } )
+        val workflowBuilderModule = WorkflowBuilderModule.Builder(publicMerchantKey = inputData.businessId.ifEmpty { "61d880f1e8e15aaf24558f1a" }, formId = inputData.formId.ifEmpty { "64a6c1501d9315437ae409be" } )
             .dev(true)
             .userInfo(
                 userInfo
@@ -198,7 +198,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        vFormModule.start(this@MainActivity)
+        workflowBuilderModule.start(this@MainActivity)
 
     }
 

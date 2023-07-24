@@ -1,9 +1,5 @@
 package co.youverify.yvos_sdk
 
-import co.youverify.yvos_sdk.modules.documentcapture.DocumentCaptureModule
-import co.youverify.yvos_sdk.modules.livenesscheck.LivenessCheckModule
-import co.youverify.yvos_sdk.modules.vform.VFormModule
-
 /**
  * The entry point to initialize and access any of the SDK services.
  */

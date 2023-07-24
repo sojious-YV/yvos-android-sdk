@@ -3,7 +3,7 @@ package co.youverify.yvos_sdk.data
 import co.youverify.yvos_sdk.SdkModule
 import co.youverify.yvos_sdk.modules.documentcapture.DocumentCaptureModule
 import co.youverify.yvos_sdk.modules.livenesscheck.LivenessCheckModule
-import co.youverify.yvos_sdk.modules.vform.VFormModule
+import co.youverify.yvos_sdk.modules.workflowBuilder.WorkflowBuilderModule
 import co.youverify.yvos_sdk.util.VFORM_DEVELOPMENT_API_BASE_URL
 import co.youverify.yvos_sdk.util.IDENTITY_DEVELOPMENT_API_BASE_URL
 import co.youverify.yvos_sdk.util.VFORM_PRODUCTION_API_BASE_URL
@@ -21,7 +21,7 @@ internal object SdkServiceFactory {
     fun sdkService(module: SdkModule):SdkService{
 
        val baseUrl= when(module){
-            is VFormModule->{
+            is WorkflowBuilderModule->{
                 if (module.dev && module.sandBoxEnvironment) VFORM_STAGING_API_BASE_URL
                 else if (!module.dev) VFORM_PRODUCTION_API_BASE_URL
                 else  VFORM_DEVELOPMENT_API_BASE_URL

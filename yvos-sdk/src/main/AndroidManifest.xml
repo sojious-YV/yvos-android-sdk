@@ -22,7 +22,7 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.VformApp" />
         <activity
-            android:name=".modules.vform.FormActivity"
+            android:name=".modules.workflowBuilder.FormActivity"
             android:exported="false"
             android:launchMode="singleTop" />
     </application>

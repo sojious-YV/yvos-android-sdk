@@ -1,4 +1,4 @@
-package co.youverify.yvos_sdk.modules.vform
+package co.youverify.yvos_sdk.modules.workflowBuilder
 
 /**
  * Specifies both required and optional information needed to display the appropriate form.

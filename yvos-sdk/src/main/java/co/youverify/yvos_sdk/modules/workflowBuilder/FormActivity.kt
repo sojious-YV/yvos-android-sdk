@@ -1,4 +1,4 @@
-package co.youverify.yvos_sdk.modules.vform
+package co.youverify.yvos_sdk.modules.workflowBuilder
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -63,7 +63,7 @@ internal class FormActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        lifecycle.addObserver(VFormModule.formActivityObserver)
+        lifecycle.addObserver(WorkflowBuilderModule.formActivityObserver)
 
         setContentView(R.layout.activity_form)
         initializeViews()
@@ -91,7 +91,7 @@ internal class FormActivity : AppCompatActivity() {
     private fun initializeViews() {
 
         //closeButton=findViewById(R.id.form_close_button)
-        val customization= VFormModule.formActivityObserver.vFormModule.customization
+        val customization= WorkflowBuilderModule.formActivityObserver.workflowBuilderModule.customization
         progressIndicatorView=findViewById(R.id.progressIndicatorView)
         modalWindowView=findViewById(R.id.modalWindowView)
         webView=findViewById(R.id.webView_Vform)
@@ -139,7 +139,7 @@ internal class FormActivity : AppCompatActivity() {
                 webView.loadUrl(url!!)
             }else{
                 urlIsLoading=true
-                VFormModule.formActivityObserver.sendFormUrl()
+                WorkflowBuilderModule.formActivityObserver.sendFormUrl()
             }
 
         }
@@ -249,7 +249,7 @@ internal class FormActivity : AppCompatActivity() {
                 if (url!=null){
                     webView.loadUrl(url!!)
                 }else{
-                    VFormModule.formActivityObserver.sendFormUrl()
+                    WorkflowBuilderModule.formActivityObserver.sendFormUrl()
                 }
             }
             else{
@@ -293,7 +293,7 @@ internal class FormActivity : AppCompatActivity() {
         if(data.contains(FormResultType.COMPLETED.id)){
 
             Log.d("FormActivity",data)
-            val formData= Gson().fromJson(data,VFormResultData::class.java)
+            val formData= Gson().fromJson(data,FormResultData::class.java)
             onCompleted(data)
             return
 
@@ -301,14 +301,14 @@ internal class FormActivity : AppCompatActivity() {
 
         if(data.contains(FormResultType.SUCCESS.id)){
             Log.d("FormActivity",data)
-            val formData= Gson().fromJson(data,VFormResultData::class.java)
+            val formData= Gson().fromJson(data,FormResultData::class.java)
             onSuccess(data)
             return
         }
 
         if(data.contains(FormResultType.FAILURE.id)){
             Log.d("FormActivity",data)
-            val formData= Gson().fromJson(data,VFormResultData::class.java)
+            val formData= Gson().fromJson(data,FormResultData::class.java)
             onFailed()
             return
         }

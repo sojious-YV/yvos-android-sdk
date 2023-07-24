@@ -6,7 +6,7 @@ import co.youverify.yvos_sdk.Customization;
 import co.youverify.yvos_sdk.GenderType;
 import co.youverify.yvos_sdk.UserInfo;
 import co.youverify.yvos_sdk.modules.livenesscheck.LivenessCheckModule;
-import co.youverify.yvos_sdk.modules.vform.VFormModule;
+import co.youverify.yvos_sdk.modules.workflowBuilder.WorkflowBuilderModule;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
@@ -15,7 +15,7 @@ public class SdkInJava {
 
     void testVform() {
 
-        VFormModule vFormModule = new VFormModule.Builder("61d880f1e8f1a", "64a6c15e409be")
+        WorkflowBuilderModule workflowBuilderModule = new WorkflowBuilderModule.Builder("61d880f1e8f1a", "64a6c15e409be")
                 .dev(true) // only set to true if you're in development mode. The default value is false.
                 .userInfo(
                         //specify user details to be used to prepopulate the form

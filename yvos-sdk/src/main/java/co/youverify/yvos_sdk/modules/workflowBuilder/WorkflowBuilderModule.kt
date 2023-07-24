@@ -1,4 +1,4 @@
-package co.youverify.yvos_sdk.modules.vform
+package co.youverify.yvos_sdk.modules.workflowBuilder
 
 import android.content.Context
 import android.content.Intent
@@ -26,9 +26,9 @@ import co.youverify.yvos_sdk.util.validatePublicMerchantKeyAndAppearance
 /**
  * This class enables access to the Vform service.
  * @param builder object used to define both mandatory and optional parameters.
- * @constructor creates an instant of [VFormModule] using the passed in builder.
+ * @constructor creates an instant of [WorkflowBuilderModule] using the passed in builder.
  */
-class VFormModule private constructor(builder: Builder): SdkModule(
+class WorkflowBuilderModule private constructor(builder: Builder): SdkModule(
     builder.publicMerchantKey,
     builder.dev,builder.customization,
     builder.userInfo,
@@ -37,7 +37,7 @@ class VFormModule private constructor(builder: Builder): SdkModule(
 
 
     private lateinit var mContext: Context
-    var vFormId: String
+    var formId: String
         private set
     var onSuccess: (String) -> Unit
         private set
@@ -51,7 +51,7 @@ class VFormModule private constructor(builder: Builder): SdkModule(
     private set
 
     init {
-        this.vFormId = builder.vFormId
+        this.formId = builder.formId
         this.onSuccess = builder.onSuccess
         this.onFailed = builder.onFailed
         this.onCompleted = builder.onCompleted
@@ -68,7 +68,7 @@ class VFormModule private constructor(builder: Builder): SdkModule(
 
     class Builder(publicMerchantKey:String,formId:String){
         //private lateinit var mContext: Context
-        var vFormId: String
+        var formId: String
         var publicMerchantKey: String
         var dev:Boolean = false
         var customization:Customization = Customization.Builder().build()
@@ -84,7 +84,7 @@ class VFormModule private constructor(builder: Builder): SdkModule(
 
 
         init {
-            this.vFormId=formId
+            this.formId=formId
             this.publicMerchantKey = publicMerchantKey
         }
         fun dev(dev:Boolean): Builder {
@@ -125,8 +125,8 @@ class VFormModule private constructor(builder: Builder): SdkModule(
             return this
         }
 
-        fun build(): VFormModule {
-            return VFormModule(this)
+        fun build(): WorkflowBuilderModule {
+            return WorkflowBuilderModule(this)
         }
     }
 
@@ -162,7 +162,7 @@ class VFormModule private constructor(builder: Builder): SdkModule(
 
         val personalInfo=userInfo
         val request = AccessPointRequest(
-            templateId = vFormId,
+            templateId = formId,
             businessId = publicMerchantKey,
             metadata = mMetaData,
             details = if (userInfo!=null) UserDetail(
@@ -189,8 +189,8 @@ class VFormModule private constructor(builder: Builder): SdkModule(
             val accessId=response.data.data.id
             Log.d("FormActivity",accessId)
             val baseUrl=if (dev) DEVELOPMENT_BASE_URL else PRODUCTION_BASE_URL
-            val formUrl=if(sandBoxEnvironment) "${baseUrl}/v-forms/${vFormId}?accessId=${accessId}&e=s"
-            else "${baseUrl}/v-forms/${vFormId}?accessId=${accessId}"
+            val formUrl=if(sandBoxEnvironment) "${baseUrl}/v-forms/${formId}?accessId=${accessId}&e=s"
+            else "${baseUrl}/v-forms/${formId}?accessId=${accessId}"
 
 
             context.startActivity(
@@ -224,7 +224,7 @@ class VFormModule private constructor(builder: Builder): SdkModule(
             appearance = customization
         )
 
-        if (vFormId.length!= ID_LENGTH || vFormId.isEmpty())
+        if (formId.length!= ID_LENGTH || formId.isEmpty())
             throw IllegalArgumentException("vFormId cannot be empty and must be 24 characters long")
 
 

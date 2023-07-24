@@ -1,6 +1,6 @@
 package co.youverify.yvos_sdk.di
 
-import co.youverify.yvos_sdk.modules.vform.VFormModule
+import co.youverify.yvos_sdk.modules.workflowBuilder.WorkflowBuilderModule
 import dagger.Component
 import javax.inject.Singleton
 
@@ -14,5 +14,5 @@ interface AppComponent {
         fun create():AppComponent
     }
 
-    fun inject (vformModule: VFormModule)
+    fun inject (vformModule: WorkflowBuilderModule)
 }

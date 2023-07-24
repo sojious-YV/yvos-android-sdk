@@ -1,6 +1,6 @@
-package co.youverify.yvos_sdk.modules.vform
+package co.youverify.yvos_sdk.modules.workflowBuilder
 
-internal data class VFormResultData(
+internal data class FormResultData(
     val data: Data?,
     val id: String
 )
