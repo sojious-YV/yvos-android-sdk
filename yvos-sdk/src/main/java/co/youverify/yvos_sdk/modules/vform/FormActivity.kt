@@ -39,8 +39,8 @@ internal class FormActivity : AppCompatActivity() {
     var urlIsLoading: Boolean = false
     private set
     private var pageIsAlreadyLoading: Boolean=false
-    private var url: kotlin.String?=null
-    private var userName: kotlin.String?=null
+    private var url: String?=null
+    private var userName: String?=null
     var cameraPermissionGranted: Boolean=false
     private set
     lateinit var modalWindowView: ComposeView
@@ -53,7 +53,7 @@ internal class FormActivity : AppCompatActivity() {
     private lateinit var progressIndicatorView: ComposeView
     private var fileChooserValueCallback: ValueCallback<Array<Uri>>? = null
     private var fileChooserLauncher: ActivityResultLauncher<Intent> = createFileChooserLauncher()
-    private val cameraPermissionRequestLauncher:ActivityResultLauncher<kotlin.String> = createCameraPermissionRequestLauncher()
+    private val cameraPermissionRequestLauncher:ActivityResultLauncher<String> = createCameraPermissionRequestLauncher()
     lateinit var onFailed:()->Unit
     lateinit var onSuccess:(String)->Unit
     lateinit var onCompleted:(String)->Unit
