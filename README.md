@@ -24,7 +24,7 @@ dependencies {
 
 ## How to Use
 
-The SDK offers 3 services separated into **Modules\*\***. Each Module provides a `Builder` class to instantiate and gain access to its functionality.
+The SDK offers 3 services separated into **Modules**. Each Module provides a `Builder` class to instantiate and gain access to its functionality.
 
 You can also provide optional parameters like:
 
@@ -113,15 +113,9 @@ The process is automatically canceled once either of the `onSuccess` or `onCompl
 
 ### Use VFormModule with Java
 
-You can create an instance of the VFormModule with Java by using the `VFormModule.Builder` class.
+You can create an instance of the VFormModule with Java by using the `VFormModule.Builder` class, as the following example below:
 
-<details>
- <summary>Keep reading for more details</summary>
-
-You can create an instance of the VFormModule as the following example below:
-
-<pre>
-<code class="language-kotlin">java
+```java
  VFormModule vFormModule = new VFormModule.Builder("61d880f1e8f1a", "64a6c15e409be")
                 .dev(true) // only set to true if you're in development mode. The default value is false.
                 .userInfo(
@@ -166,22 +160,19 @@ You can create an instance of the VFormModule as the following example below:
                 })
                 .metaData(Collections.emptyMap()) // any other information you wish to pass to your Webhook Url
                 .build();
-</code>
-</pre>
+```
 
 #### Display the Form
 
-<pre>java
+```java
 vFormModule.start(context);
-</pre>
+```
 
 #### Cancel the process
 
-<pre>java
+```java
 vFormModule.close();
-</pre>
-
-</details>
+```
 
 ### Using the Liveness Check Module with Kotlin
 
@@ -260,15 +251,9 @@ The process is automatically canceled once the `onSuccess` callbacks returns, bu
 
 ### Use LivenessCheckModule with Java
 
-You can create an instance of the LivenessCheckModule with Java by using the `LivenessCheckModule.Builder` class.
+You can create an instance of the LivenessCheckModule with Java by using the `LivenessCheckModule.Builder` class, as the following example below:
 
-<details>
- <summary>Keep reading for more details</summary>
-
-You can create an instance of the LivenessCheckModule as the following example below:
-
-<pre>
-<code class="language-kotlin">javajava
+```java
  LivenessCheckModule livenessCheckModule = new LivenessCheckModule.Builder("61d880f1e8f1a")
                 .dev(true) // only set to true if you're in development mode. The default value is false.
                 .userInfo(
@@ -324,22 +309,19 @@ You can create an instance of the LivenessCheckModule as the following example b
                 })
                 .metaData(Collections.emptyMap()) // any other information you wish to pass to your Webhook Url
                 .build();
-</pre>
-</code>
+```
 
 #### Start the process
 
-<pre>java
+```java
 LivenessCheckModule.start(context);
-</pre>
+```
 
 #### Cancel the process
 
-<pre>java
+```java
 LivenessCheckModule.close();
-</pre>
-
-</details>
+```
 
 ### Using the Document Capture Module with Kotlin
 
@@ -417,12 +399,7 @@ The process is automatically canceled once the `onSuccess` callbacks returns, bu
 
 ### Use DocumentCaptureModule with Java
 
-You can create an instance of the DocumentCaptureModule with Java by using the `DocumentCaptureModule.Builder` class.
-
-<details>
- <summary>Keep reading for more details</summary>
-
-You can create an instance of the DocumentCaptureModule as the following example below:
+You can create an instance of the DocumentCaptureModule with Java by using the `DocumentCaptureModule.Builder` class, as the following example below:
 
 ```java
  DocumentCaptureModule documentCaptureModule = new DocumentCaptureModule.Builder("61d880f1e8f1a")
@@ -492,8 +469,6 @@ documentCaptureModule.start(context);
 ```java
 documentCaptureModule.close();
 ```
-
-</details>
 
 ## Report Issues
 
