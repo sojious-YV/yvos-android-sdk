@@ -2,15 +2,18 @@
 
 The official SDK for Youverify OS. The SDK provides you with a seamless way to integrate Youverify services into your Android app. With the SDK your users can fill out created Vforms, perform a liveness check and a document capture while you're provided with the status and details of each process in-app.
 
-The Android SDK supports both *Kotlin* and *Java*, but we strongly recommend using *Kotlin*.
+The Android SDK supports both _Kotlin_ and _Java_, but we strongly recommend using _Kotlin_.
 
 ## Requirement
-Your app must declare a `minimum Sdk version` of at least **24** (Android 6.0 and above).
+
+Your app must declare a `minimum SDK version` of at least **24** (Android 6.0 and above).
 
 ## Including in your project
+
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/balloon.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.skydoves%22%20AND%20a:%22balloon%22)
 
 ### Gradle
+
 Add the dependency below to your **module**'s `build.gradle` file located under `app/build.grade`:
 
 ```gradle
@@ -20,18 +23,21 @@ dependencies {
 ```
 
 ## How to Use
-The SDK offers 3 services seperated into **Modules**. Each Module provides a `Builder` class to instantiate and gain access to its functionality. 
+
+The SDK offers 3 services separated into **Modules\*\***. Each Module provides a `Builder` class to instantiate and gain access to its functionality.
 
 You can also provide optional parameters like:
-* **User personal information**, 
-* **customization options**
-* **metadata ( to be passed to your webhook Url)"** to the `Builder object`.
 
-The customization options are used to customize the SDK's UI to align with your app's theme and also show a personalized message (using the user's first name) to the user before any of the processes starts while the user information is either used to automatically fill in some fields in the form or is stored alongside the result of a successfull liveness check to our remote server.
+- **User personal information**,
+- **customization options**
+- **metadata ( to be passed to your webhook Url)"** to the `Builder object`.
+
+The customization options are used to customize the SDK's UI to align with your app's theme and also show a personalized message (using the user's first name) to the user before any of the processes starts while the user information is either used to automatically fill in some fields in the form or is stored alongside the result of a successful liveness check to our remote server.
 The SDK supports both Kotlin and Java projects, so you can reference it in your language.
 
-###  Using the VForm Module with Kotlin
-First create an instance of the VFormModule with the `VFormModule.Builder` class, passing in your merchant key and the templateId of the form to be displayed.
+### Using the VForm Module with Kotlin
+
+First off, create an instance of the VFormModule with the `VFormModule.Builder` class, passing in your merchant key and the template Id of the form to be displayed.
 
 ```kotlin
 val vFormModule = VFormModule.Builder(publicMerchantKey = "61d880f1e8e18f1a", formId = "64a6c1501dae409be")
@@ -40,7 +46,7 @@ val vFormModule = VFormModule.Builder(publicMerchantKey = "61d880f1e8e18f1a", fo
                 //"formData" is a JSON String containing key-value pairs of the form fields and their values.
                 //say you wanted to retrieve the value that was filled for the "first name" field in the form:
                 //val  userFirstName  = JSONObject(formData).getJSONObject("fields").getString("firstName");
-               
+
             }
             .onFailed {
                 //form submission failed due to some error. perform some action here
@@ -48,12 +54,13 @@ val vFormModule = VFormModule.Builder(publicMerchantKey = "61d880f1e8e18f1a", fo
             .build()
 ```
 
-#### Specifying optional parameters: 
+#### Specifying optional parameters:
+
 ```kotlin
 val vFormModule = VFormModule.Builder(publicMerchantKey = "61d880f1e8f1a", formId = "64a6c15e409be" )
             .dev(true) // only set to true if you're in development mode. The default value is false.
             .userInfo(
-                //specify user details to be automatically filled and omitted from the form 
+                //specify user details to be automatically filled and omitted from the form
                 UserInfo.Builder()
                     .firstName("Jagaban")
                     .lastName("Cynthia")
@@ -66,9 +73,9 @@ val vFormModule = VFormModule.Builder(publicMerchantKey = "61d880f1e8f1a", formI
             .customization(
                 // customize the UI and the message shown to your user before the form shows up
                 Customization.Builder()
-                    .primaryColor("#ffffff") 
-                    .greetingMessage("We will need to verify your identity. It will only take a moment.") 
-                    .actionButtonText("Proceed") 
+                    .primaryColor("#ffffff")
+                    .greetingMessage("We will need to verify your identity. It will only take a moment.")
+                    .actionButtonText("Proceed")
                     .actionButtonTextColor("#46B2C8")
                     .
                     .
@@ -87,26 +94,34 @@ val vFormModule = VFormModule.Builder(publicMerchantKey = "61d880f1e8f1a", formI
             .metaData(emptyMap()) // Any other inormation you wish to pass to your Webhook url
             .build()
 ```
+
 #### Display the form
+
 Call `start()` on the `VFormModule` instance passing in a `Context` object to show the form to your user:
+
 ```kotlin
  vFormModule.start(context)
 ```
 
 #### Cancel the process
-The process is automatically cancelled once either of the `onSuccess` or `onCompleted` callbacks returns, but you can also cancel manually by calling `close()`:
+
+The process is automatically canceled once either of the `onSuccess` or `onCompleted` callbacks returns, but you can also cancel manually by calling `close()`:
+
 ```kotlin
  vFormModule.close() // cancel the process
 ```
 
 ### Use VFormModule with Java
+
 You can create an instance of the VFormModule with Java by using the `VFormModule.Builder` class.
 
 <details>
  <summary>Keep reading for more details</summary>
 
-You can create an instance of the VFormModule as the following example below: 
-```java
+You can create an instance of the VFormModule as the following example below:
+
+<pre>
+<code class="language-kotlin">java
  VFormModule vFormModule = new VFormModule.Builder("61d880f1e8f1a", "64a6c15e409be")
                 .dev(true) // only set to true if you're in development mode. The default value is false.
                 .userInfo(
@@ -151,28 +166,33 @@ You can create an instance of the VFormModule as the following example below:
                 })
                 .metaData(Collections.emptyMap()) // any other information you wish to pass to your Webhook Url
                 .build();
-```
+</code>
+</pre>
 
 #### Display the Form
-```java
+
+<pre>java
 vFormModule.start(context);
-```
+</pre>
 
 #### Cancel the process
-```java
+
+<pre>java
 vFormModule.close();
-```
+</pre>
+
 </details>
 
-###  Using the Liveness Check Module with Kotlin
-First create an instance of the LivenessCheckModule with the `LivenessCheckModule.Builder` class, passing in your merchant key.
+### Using the Liveness Check Module with Kotlin
+
+First off, create an instance of the LivenessCheckModule with the `LivenessCheckModule.Builder` class, passing in your merchant key.
 
 ```kotlin
 val livenessCheckModule = LivenessCheckModule.Builder(publicMerchantKey = "61d880f1e8e18f1a")
             .onSuccess { livenessPhoto ->
                 //The liveness check completes successfully. perform some action here.
                 //"livenessPhoto" is the base64 encoded String of the snapshot taken during the liveness check.
-               
+
             }
             .onFailed {
                 //Liveness check failed. perform some action here
@@ -180,7 +200,8 @@ val livenessCheckModule = LivenessCheckModule.Builder(publicMerchantKey = "61d88
             .build()
 ```
 
-#### Specifying optional parameters: 
+#### Specifying optional parameters:
+
 ```kotlin
 val livenessCheckModule = LivenessCheckModule.Builder(publicMerchantKey = "61d880f1e8f1a" )
             .dev(true) // only set to true if you're in development mode. The default value is false.
@@ -194,9 +215,9 @@ val livenessCheckModule = LivenessCheckModule.Builder(publicMerchantKey = "61d88
             .customization(
                 // customize the UI and the message shown to your user before the liveness check process starts
                 Customization.Builder()
-                    .primaryColor("#ffffff") 
-                    .greetingMessage("We will need to carry out a liveness check. It will only take a moment.") 
-                    .actionButtonText("Start Liveness Test") 
+                    .primaryColor("#ffffff")
+                    .greetingMessage("We will need to carry out a liveness check. It will only take a moment.")
+                    .actionButtonText("Start Liveness Test")
                     .actionButtonTextColor("#46B2C8")
                     .
                     .
@@ -220,25 +241,32 @@ val livenessCheckModule = LivenessCheckModule.Builder(publicMerchantKey = "61d88
             .metaData(emptyMap()) // Any other inormation you wish to pass to your Webhook url
             .build()
 ```
+
 #### Start the process
+
 Call `start()` on the `LivenessCheckModule` instance passing in a `Context` object to start the process:
+
 ```kotlin
  livenessCheckModule.start(context)
 ```
 
 #### Cancel the process
-The process is automatically cancelled once the `onSuccess`  callbacks returns, but you can also cancel manually by calling `close()`:
+
+The process is automatically canceled once the `onSuccess` callbacks returns, but you can also cancel manually by calling `close()`:
+
 ```kotlin
  livenessCheckModule.close() // cancel the process
 ```
 
 ### Use LivenessCheckModule with Java
+
 You can create an instance of the LivenessCheckModule with Java by using the `LivenessCheckModule.Builder` class.
 
 <details>
  <summary>Keep reading for more details</summary>
 
-You can create an instance of the LivenessCheckModule as the following example below: 
+You can create an instance of the LivenessCheckModule as the following example below:
+
 ```java
  LivenessCheckModule livenessCheckModule = new LivenessCheckModule.Builder("61d880f1e8f1a")
                 .dev(true) // only set to true if you're in development mode. The default value is false.
@@ -298,26 +326,29 @@ You can create an instance of the LivenessCheckModule as the following example b
 ```
 
 #### Start the process
+
 ```java
 LivenessCheckModule.start(context);
 ```
 
 #### Cancel the process
+
 ```java
 LivenessCheckModule.close();
 ```
+
 </details>
 
+### Using the Document Capture Module with Kotlin
 
-###  Using the Document Capture Module with Kotlin
-First create an instance of the DocumentCaptureModule with the `DocumentCaptureModule.Builder` class, passing in your merchant key.
+First off, create an instance of the DocumentCaptureModule with the `DocumentCaptureModule.Builder` class, passing in your merchant key.
 
 ```kotlin
 val documentCaptureModule = DocumentCaptureModule.Builder(publicMerchantKey = "61d880f1e8e18f1a")
             .onSuccess { documentData ->
                 //The document capture was successfull. perform some action here
                 //"documentData" is the data object that holds the details extracted from the document
-               
+
             }
             .onFailed {
                 //Document capture failed. perform some action here
@@ -325,7 +356,8 @@ val documentCaptureModule = DocumentCaptureModule.Builder(publicMerchantKey = "6
             .build()
 ```
 
-#### Specifying optional parameters: 
+#### Specifying optional parameters:
+
 ```kotlin
 val documentCaptureModule = DocumentCaptureModule.Builder(publicMerchantKey = "61d880f1e8f1a" )
             .dev(true) // only set to true if you're in development mode. The default value is false.
@@ -338,9 +370,9 @@ val documentCaptureModule = DocumentCaptureModule.Builder(publicMerchantKey = "6
             .customization(
                 // customize the UI and the message shown to your user before the document capture process starts
                 Customization.Builder()
-                    .primaryColor("#ffffff") 
-                    .greetingMessage("We will need to carry out a  document capture. It will only take a moment.") 
-                    .actionButtonText("Start Document Capture") 
+                    .primaryColor("#ffffff")
+                    .greetingMessage("We will need to carry out a  document capture. It will only take a moment.")
+                    .actionButtonText("Start Document Capture")
                     .actionButtonTextColor("#46B2C8")
                     .
                     .
@@ -364,25 +396,32 @@ val documentCaptureModule = DocumentCaptureModule.Builder(publicMerchantKey = "6
             .metaData(emptyMap()) // Any other inormation you wish to pass to your Webhook url
             .build()
 ```
+
 #### Start the process
+
 Call `start()` on the `DocumentCaptureModule` instance passing in a `Context` object to start the process:
+
 ```kotlin
  documentCaptureModule.start(context)
 ```
 
 #### Cancel the process
-The process is automatically cancelled once the `onSuccess`  callbacks returns, but you can also cancel manually by calling `close()`:
+
+The process is automatically canceled once the `onSuccess` callbacks returns, but you can also cancel manually by calling `close()`:
+
 ```kotlin
  documentCaptureModule.close() // cancel the process
 ```
 
 ### Use DocumentCaptureModule with Java
+
 You can create an instance of the DocumentCaptureModule with Java by using the `DocumentCaptureModule.Builder` class.
 
 <details>
  <summary>Keep reading for more details</summary>
 
-You can create an instance of the DocumentCaptureModule as the following example below: 
+You can create an instance of the DocumentCaptureModule as the following example below:
+
 ```java
  DocumentCaptureModule documentCaptureModule = new DocumentCaptureModule.Builder("61d880f1e8f1a")
                 .dev(true) // only set to true if you're in development mode. The default value is false.
@@ -390,7 +429,7 @@ You can create an instance of the DocumentCaptureModule as the following example
                         //specify user's first name to be used in the personalized message shown to the user
                         new UserInfo.Builder()
                                 .firstName("Jagaban")
-                                
+
                 )
                 .customization(
                         // customize the UI and the message shown to your user before the document capture process starts
@@ -441,16 +480,18 @@ You can create an instance of the DocumentCaptureModule as the following example
 ```
 
 #### Start the process
+
 ```java
 documentCaptureModule.start(context);
 ```
 
 #### Cancel the process
+
 ```java
 documentCaptureModule.close();
 ```
-</details>
 
+</details>
 
 ## Report Issues
 
