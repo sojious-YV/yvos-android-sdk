@@ -238,6 +238,8 @@ internal class DocumentCaptureActivity : AppCompatActivity() {
 
     fun onDocumentDataReceived(data: String) {
 
+
+
         //If the browser event sent does not contain document data
         if (data.contains("origin")){
             return
