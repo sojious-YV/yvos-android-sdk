@@ -51,7 +51,7 @@ class LivenessCheckModule  constructor(builder:Builder): SdkModule(
          internal lateinit var livenessActivityObserver: LivenessActivityObserver
      }
 
-    class Builder(publicMerchantKey: kotlin.String){
+    class Builder(publicMerchantKey: String){
 
         var publicMerchantKey: kotlin.String
         var dev:Boolean = false

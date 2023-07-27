@@ -70,4 +70,19 @@ package co.youverify.yvos_sdk
              return Customization(this)
          }
      }
- }
+
+    override fun equals(other: Any?): Boolean {
+
+        if (this === other) return true
+        if (other !is Customization) return false
+        return this.primaryColor==other.primaryColor && this.actionText==other.actionText
+                && this.greeting==other.greeting && this.buttonTextColor==other.buttonTextColor
+                && this.buttonBackgroundColor==other.buttonBackgroundColor
+
+
+    }
+
+    override fun hashCode(): Int = 31 * primaryColor.hashCode() + actionText.hashCode() +
+            greeting.hashCode() + buttonTextColor.hashCode() + buttonBackgroundColor.hashCode()
+
+}

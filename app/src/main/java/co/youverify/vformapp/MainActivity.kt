@@ -167,6 +167,8 @@ class MainActivity : AppCompatActivity() {
 
 
         //val vFormModule=YouverifySdk.vFormModule(option = vFormOption)
+        //val vFormModule = YouverifySdk.vFormModule(VFormOption())
+        //val livenessCheckModule = YouverifySdk.livenessModule(LivenessOption())
         if (mFormData!=null) mFormData = null
 
         val workflowBuilderModule = WorkflowBuilderModule.Builder(publicMerchantKey = inputData.businessId.ifEmpty { "61d880f1e8e15aaf24558f1a" }, formId = inputData.formId.ifEmpty { "64a6c1501d9315437ae409be" } )

@@ -216,16 +216,14 @@ class WorkflowBuilderModule private constructor(builder: Builder): SdkModule(
     }
 
     private fun validateProperties() {
+        validatePublicMerchantKeyAndAppearance(publicMerchantKey = publicMerchantKey, appearance = customization)
+        validateFormId()
 
-        //val personalInfo=userInfo
+    }
 
-        validatePublicMerchantKeyAndAppearance(
-            publicMerchantKey = publicMerchantKey,
-            appearance = customization
-        )
-
+   internal  fun validateFormId() {
         if (formId.length!= ID_LENGTH || formId.isEmpty())
-            throw IllegalArgumentException("vFormId cannot be empty and must be 24 characters long")
+            throw IllegalArgumentException("formId cannot be empty and must be 24 characters long")
 
 
         if (userInfo!=null){
@@ -234,9 +232,8 @@ class WorkflowBuilderModule private constructor(builder: Builder): SdkModule(
                 userInfo?.middleName?.isEmpty()==true || userInfo?.email?.isEmpty()==true ||
                 userInfo?.mobile?.isEmpty()==true
             )
-                throw IllegalArgumentException("Personal Information fields cannot be empty")
+                throw IllegalArgumentException("UserInfo fields cannot be empty")
         }
-
     }
 
     fun close(){

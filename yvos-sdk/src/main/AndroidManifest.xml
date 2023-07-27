@@ -15,16 +15,19 @@
             android:name=".modules.documentcapture.DocumentCaptureActivity"
             android:exported="false"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.VformApp" />
+            android:theme="@style/Theme.VformApp"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".modules.livenesscheck.LivenessCheckActivity"
             android:exported="false"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.VformApp" />
+            android:theme="@style/Theme.VformApp"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".modules.workflowBuilder.FormActivity"
             android:exported="false"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

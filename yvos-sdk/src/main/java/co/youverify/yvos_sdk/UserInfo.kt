@@ -72,6 +72,19 @@ class UserInfo private constructor(builder:Builder){
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+
+        if (this === other) return true
+        if (other !is UserInfo) return false
+        return this.firstName==other.firstName && this.lastName==other.lastName
+                && this.middleName==other.middleName && this.mobile==other.mobile
+                && this.email==other.email && this.gender==other.gender
+
+
+    }
+
+    override fun hashCode(): Int = 31 * firstName.hashCode() + lastName.hashCode() +
+            middleName.hashCode() + mobile.hashCode() + email.hashCode() + gender.hashCode()
 }
 
 enum class GenderType{

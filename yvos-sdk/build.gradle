@@ -39,6 +39,9 @@ android {
         viewBinding true
         compose true
     }
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
     composeOptions {
         kotlinCompilerExtensionVersion '1.4.6'
         //kotlinCompilerVersion '1.4.21'
@@ -86,7 +89,14 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+
     testImplementation 'junit:junit:4.13.2'
+    //testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+
+    //Roboelectric
+    testImplementation  "org.robolectric:robolectric:4.9"
+
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 

@@ -10,7 +10,7 @@ Your app must declare a `minimum SDK version` of at least **24** (Android 6.0 an
 
 ## Including in your project
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/balloon.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.skydoves%22%20AND%20a:%22balloon%22)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.skydoves/balloon.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/co.youverify/yvos.android/1.0.0)
 
 ### Gradle
 
@@ -18,7 +18,7 @@ Add the dependency below to your **module**'s `build.gradle` file located under 
 
 ```gradle
 dependencies {
-    implementation "co.youverify.yvos:android:1.0.0"
+    implementation "co.youverify.yvos.android:1.0.0"
 }
 ```
 

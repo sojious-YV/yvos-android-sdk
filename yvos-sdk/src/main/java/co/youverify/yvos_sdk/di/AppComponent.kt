@@ -14,5 +14,5 @@ interface AppComponent {
         fun create():AppComponent
     }
 
-    fun inject (vformModule: WorkflowBuilderModule)
+    //fun inject (vformModule: WorkflowBuilderModule)
 }
