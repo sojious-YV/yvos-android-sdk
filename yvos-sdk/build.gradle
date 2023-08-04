@@ -2,11 +2,21 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+   // id  'org.jetbrains.dokka'
+   // id "kotlin.plugin.serialization"
 
 }
+// Kene added configurations
+ext {
+    PUBLISH_GROUP_ID = 'co.youverify'
+    PUBLISH_VERSION = '1.0.0'
+    PUBLISH_ARTIFACT_ID = 'yvos.android'
+}
+apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"
 
+// Contiinuation of Android dev's code
 android {
-    namespace 'co.youverify.workflow_builder_sdk'
+    namespace 'co.youverify.yvos_sdk'
     compileSdk 33
 
     defaultConfig {
@@ -24,27 +34,77 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        //sourceCompatibility JavaVersion.VERSION_1_8
+        //targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_18
+        targetCompatibility JavaVersion.VERSION_18
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        //jvmTarget = '1.8'
+        jvmTarget = '18'
     }
     buildFeatures {
         viewBinding true
+        compose true
     }
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.4.6'
+        //kotlinCompilerVersion '1.4.21'
+    }
+    // dokkaHtml.mustRunAfter(':yvos-sdk:kaptReleaseKotlin')
 }
+
+/*tasks.named("dokkaHtml") {
+    // ..
+    // general configuration section
+    // ..
+
+    moduleName.set("YVOS-ANDROID-SDK")
+    outputDirectory.set(file("build/dokka/my_documentation"))
+
+
+    dokkaSourceSets.configureEach {
+        // ..
+        // Source set configuration section
+        // ..
+
+        for (def pkg : [".*components", ".*data", ".*di",".*theme",".*util"]) {
+
+            perPackageOption {
+
+
+                //matchingRegex.set(".*components")
+                matchingRegex.set(pkg)
+                suppress.set(true)
+                skipDeprecated.set(false)
+                reportUndocumented.set(false)
+                //documentedVisibilities.set([Visibility.PUBLIC])
+            }
+
+        }
+    }
+}*/
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.10.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+
     testImplementation 'junit:junit:4.13.2'
+    //testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+
+    //Roboelectric
+    testImplementation  "org.robolectric:robolectric:4.9"
+
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
@@ -70,6 +130,22 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:2.44.2"
 
     // Androidx webkit
-    implementation"androidx.webkit:webkit:1.6.1"
+    implementation"androidx.webkit:webkit:1.7.0"
+
+    //Jetpack compose
+    implementation 'androidx.activity:activity-compose:1.7.2'
+    implementation "androidx.compose.ui:ui:$compose_version"
+    implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
+    implementation 'androidx.compose.material3:material3-android:1.2.0-alpha02'
+    implementation "androidx.compose.animation:animation:$compose_version"
+    implementation "androidx.compose.foundation:foundation:$compose_version"
+    implementation "androidx.compose.runtime:runtime:$compose_version"
+
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
+    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+
+    //implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0"
+
 
 }

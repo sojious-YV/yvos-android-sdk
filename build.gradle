@@ -2,13 +2,38 @@
 
 buildscript {
 
-    //dependencies {
-       // classpath "com.google.dagger:hilt-android-gradle-plugin:2.44.2"
-    //}
+
+    ext{
+        compose_version = '1.4.3'
+    }
+
+    dependencies {
+        //classpath "com.google.dagger:hilt-android-gradle-plugin:2.44.2"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20"
+        //classpath "org.jetbrains.kotlin:kotlin-serialization:1.8.21"
+    }
+    repositories {
+        mavenCentral()
+        google()
+    }
 
 }
+//// Kene added configurations
+//apply plugin: 'io.github.gradle-nexus.publish-plugin'
+
 plugins {
-    id 'com.android.application' version '7.4.2' apply false
-    id 'com.android.library' version '7.4.2' apply false
-    id 'org.jetbrains.kotlin.android' version '1.8.10' apply false
+    id 'com.android.application' version '8.0.0' apply false
+    id 'com.android.library' version '8.0.0' apply false
+    id 'org.jetbrains.kotlin.android' version '1.8.20' apply false
+    //id "kotlin.plugin.serialization" version "1.8.21" apply false
+
+     // Kene added configurations
+     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
+
+// Kene added configurations
+apply from: "${rootDir}/scripts/publish-root.gradle"
+
+
+
+

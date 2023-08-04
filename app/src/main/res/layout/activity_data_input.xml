@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".DataInputActivity">
+
+
+   <androidx.constraintlayout.widget.ConstraintLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content">
+
+
+       <TextView
+           android:id="@+id/textView_env_variables"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="16dp"
+           android:text="Environment Variables"
+           android:textSize="20sp"
+           android:textStyle="bold"
+           app:layout_constraintEnd_toEndOf="parent"
+           app:layout_constraintStart_toStartOf="parent"
+           app:layout_constraintTop_toTopOf="parent" />
+
+       <EditText
+           android:id="@+id/editTextText_biz_id"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginStart="32dp"
+           android:layout_marginTop="24dp"
+           android:ems="10"
+           android:hint="business Id"
+           android:inputType="text"
+           app:layout_constraintStart_toStartOf="parent"
+           app:layout_constraintTop_toBottomOf="@+id/textView_env_variables" />
+
+       <EditText
+           android:id="@+id/editText_template_id"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="8dp"
+           android:ems="10"
+           android:hint="form Id"
+           android:inputType="text"
+           app:layout_constraintStart_toStartOf="@+id/editTextText_biz_id"
+           app:layout_constraintTop_toBottomOf="@+id/editTextText_biz_id" />
+
+       <EditText
+           android:id="@+id/editText_dev"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:ems="10"
+           android:hint="dev"
+           android:inputType="text"
+           app:layout_constraintStart_toStartOf="@+id/editText_template_id"
+           app:layout_constraintTop_toBottomOf="@+id/editText_template_id" />
+
+       <TextView
+           android:id="@+id/textView_customization"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="32dp"
+           android:text="Customization"
+           android:textSize="20sp"
+           android:textStyle="bold"
+           app:layout_constraintEnd_toEndOf="parent"
+           app:layout_constraintStart_toStartOf="parent"
+           app:layout_constraintTop_toBottomOf="@+id/editText_dev" />
+
+       <EditText
+           android:id="@+id/editText_first_name"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="24dp"
+           android:ems="10"
+           android:hint="first name"
+           android:inputType="text"
+           app:layout_constraintStart_toStartOf="@+id/editText_dev"
+           app:layout_constraintTop_toBottomOf="@+id/textView_customization" />
+
+       <EditText
+           android:id="@+id/editText_last_name"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="8dp"
+           android:ems="10"
+           android:hint="last name"
+           android:inputType="text"
+           app:layout_constraintStart_toStartOf="@+id/editText_first_name"
+           app:layout_constraintTop_toBottomOf="@+id/editText_first_name" />
+
+       <EditText
+           android:id="@+id/editText_button_bg_color"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="8dp"
+           android:ems="10"
+           android:hint="button background color"
+           android:inputType="text"
+           app:layout_constraintStart_toStartOf="@+id/editText_last_name"
+           app:layout_constraintTop_toBottomOf="@+id/editText_last_name" />
+
+       <EditText
+           android:id="@+id/editText_button_text_color"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="8dp"
+           android:ems="10"
+           android:hint="button text color"
+           android:inputType="text"
+           app:layout_constraintStart_toStartOf="@+id/editText_button_bg_color"
+           app:layout_constraintTop_toBottomOf="@+id/editText_button_bg_color" />
+
+       <EditText
+           android:id="@+id/editText_primary_color"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="8dp"
+           android:ems="10"
+           android:hint="primary color"
+           android:inputType="text"
+           app:layout_constraintStart_toStartOf="@+id/editText_button_text_color"
+           app:layout_constraintTop_toBottomOf="@+id/editText_button_text_color" />
+
+       <EditText
+           android:id="@+id/editText_greeting"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="8dp"
+           android:ems="10"
+           android:hint="greeting"
+           android:inputType="text"
+           app:layout_constraintStart_toStartOf="@+id/editText_primary_color"
+           app:layout_constraintTop_toBottomOf="@+id/editText_primary_color" />
+
+       <Button
+           android:id="@+id/button_proceed"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginEnd="32dp"
+           android:layout_marginBottom="32dp"
+           android:text="Proceed"
+           app:layout_constraintBottom_toBottomOf="parent"
+           app:layout_constraintEnd_toEndOf="parent"
+           app:layout_constraintTop_toBottomOf="@+id/editText_action_text" />
+
+       <EditText
+           android:id="@+id/editText_action_text"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="8dp"
+           android:ems="10"
+           android:hint="action text"
+           android:inputType="text"
+           app:layout_constraintStart_toStartOf="@+id/editText_greeting"
+           app:layout_constraintTop_toBottomOf="@+id/editText_greeting" />
+
+   </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

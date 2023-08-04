@@ -10,22 +10,24 @@
         android:required="true" />
 
     <application android:usesCleartextTraffic="true">
+
         <activity
             android:name=".modules.documentcapture.DocumentCaptureActivity"
             android:exported="false"
-            android:label="@string/title_activity_document_capture"
-            android:theme="@style/Theme.VformApp" />
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.VformApp"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".modules.livenesscheck.LivenessCheckActivity"
             android:exported="false"
-            android:label="@string/title_activity_liveness_check"
-            android:theme="@style/Theme.VformApp" />
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.VformApp"
+            android:screenOrientation="portrait"/>
         <activity
-            android:name=".modules.vform.FormActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.SdkActivity"
-            android:exported="true" />
+            android:name=".modules.workflowBuilder.FormActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

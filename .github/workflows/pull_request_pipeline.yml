@@ -1,0 +1,54 @@
+name: "Pull Request Check CI"
+
+on:
+  push:
+    branches:
+      - document-capture
+  pull_request:
+    branches:
+      - document-capture
+
+jobs:
+  build:
+    name: Kotlin CI Pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: "true"
+          token: ${{ secrets.GHB_USER_TOKEN }}
+
+      - name: Setup-java
+        uses: actions/setup-java@v3
+        with:
+          distribution: semeru
+          java-version: 18
+
+      - name: Lint Commit Messages
+        uses: wagoid/commitlint-github-action@v2
+      
+      # - name: "ktlint"
+      #   uses: "block42-blockchain-company/ktlint-action@master" #
+       # Builds the release artifacts of the library
+      
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build and Publish
+        run: ./gradlew :yvos-sdk:assembleRelease
+
+      - name: Send Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: "C01BL91B7TQ" #Channel ID
+          username: "YV Github Action"
+          author_name: "CI Details"
+          # if_mention: "failure,cancelled"
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took # selectable (default: repo,message)
+        env:
+          GITHUB_TOKEN: ${{ github.token }} # optional
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+          MATRIX_CONTEXT: ${{ toJson(matrix) }} # required
+        if: always() # Pick up events even if the job fails or is canceled.
